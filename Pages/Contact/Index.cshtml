@@ -1,0 +1,73 @@
+@page "/contact"
+@model SimCardShop.Pages.Contact.IndexModel
+@{
+    ViewData["Title"] = "تماس با ما";
+}
+
+<section class="section py-12 md:py-16 max-w-3xl">
+    <div class="text-center mb-10">
+        <span class="eyebrow mb-4"><svg data-lucide="phone" class="w-3.5 h-3.5"></svg>تماس با ما</span>
+        <h1 class="h2-section !text-2xl md:!text-3xl">در ارتباط باشید</h1>
+    </div>
+
+    <div class="panel p-6 md:p-8">
+        <div class="grid gap-5">
+            <div class="flex items-center gap-4">
+                <span class="w-11 h-11 rounded-xl bg-primary-50 text-primary flex items-center justify-center shrink-0"><svg data-lucide="building-2" class="w-5 h-5"></svg></span>
+                <div>
+                    <div class="text-xs text-secondary mb-0.5">نام دفتر</div>
+                    <div class="font-semibold text-ink">@Model.Settings.OfficeName</div>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(Model.Settings.Address))
+            {
+                <div class="flex items-center gap-4">
+                    <span class="w-11 h-11 rounded-xl bg-cyan-50 text-cyan flex items-center justify-center shrink-0"><svg data-lucide="map-pin" class="w-5 h-5"></svg></span>
+                    <div>
+                        <div class="text-xs text-secondary mb-0.5">آدرس</div>
+                        <div class="font-semibold text-ink">@Model.Settings.Address</div>
+                    </div>
+                </div>
+            }
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 pt-1">
+                @if (!string.IsNullOrWhiteSpace(Model.Settings.Phone))
+                {
+                    <div class="flex items-center gap-4">
+                        <span class="w-11 h-11 rounded-xl bg-purple-50 text-purple flex items-center justify-center shrink-0"><svg data-lucide="phone" class="w-5 h-5"></svg></span>
+                        <div>
+                            <div class="text-xs text-secondary mb-0.5">تلفن</div>
+                            <a href="tel:@Model.Settings.Phone" class="font-semibold text-ink hover:text-primary" dir="ltr">@Model.Settings.Phone</a>
+                        </div>
+                    </div>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Settings.Mobile))
+                {
+                    <div class="flex items-center gap-4">
+                        <span class="w-11 h-11 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0"><svg data-lucide="smartphone" class="w-5 h-5"></svg></span>
+                        <div>
+                            <div class="text-xs text-secondary mb-0.5">موبایل</div>
+                            <a href="tel:@Model.Settings.Mobile" class="font-semibold text-ink hover:text-primary" dir="ltr">@Model.Settings.Mobile</a>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="flex flex-wrap gap-3 pt-3 border-t border-line">
+                @if (!string.IsNullOrWhiteSpace(Model.Settings.WhatsAppUrl))
+                {
+                    <a href="@Model.Settings.WhatsAppUrl" class="btn-outline"><svg data-lucide="message-circle" class="w-4 h-4"></svg>واتس‌اپ</a>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Settings.TelegramUrl))
+                {
+                    <a href="@Model.Settings.TelegramUrl" class="btn-outline"><svg data-lucide="send" class="w-4 h-4"></svg>تلگرام</a>
+                }
+                @if (!string.IsNullOrWhiteSpace(Model.Settings.MapUrl))
+                {
+                    <a href="@Model.Settings.MapUrl" class="btn-outline"><svg data-lucide="map" class="w-4 h-4"></svg>مسیر روی نقشه</a>
+                }
+            </div>
+        </div>
+    </div>
+</section>

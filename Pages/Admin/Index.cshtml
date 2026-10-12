@@ -1,0 +1,134 @@
+@page "/Admin"
+@model SimCardShop.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "داشبورد";
+}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-xl font-extrabold text-ink">داشبورد</h1>
+</div>
+
+@if (Model.FollowUpTodayCount > 0)
+{
+    <div class="rounded-xl bg-warning/10 text-warning text-sm p-4 mb-6 flex items-center justify-between gap-3">
+        <span class="flex items-center gap-2"><svg data-lucide="clock-alert" class="w-4 h-4"></svg>@Model.FollowUpTodayCount مشتری امروز یا قبل‌تر باید پیگیری شوند.</span>
+        <a href="/Admin/Crm?followUpOnly=true" class="font-semibold whitespace-nowrap">مشاهده لیست</a>
+    </div>
+}
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+    <div class="stat-card">
+        <span class="stat-icon"><svg data-lucide="phone" class="w-5 h-5"></svg></span>
+        <div class="stat-value">@Model.TotalSimCards</div>
+        <div class="stat-label">تعداد شماره‌ها</div>
+    </div>
+    <div class="stat-card card-featured">
+        <span class="stat-icon bg-success/10 text-success"><svg data-lucide="check-circle-2" class="w-5 h-5"></svg></span>
+        <div class="stat-value">@Model.AvailableSimCards</div>
+        <div class="stat-label">موجود</div>
+    </div>
+    <div class="stat-card">
+        <span class="stat-icon bg-warning/10 text-warning"><svg data-lucide="clock" class="w-5 h-5"></svg></span>
+        <div class="stat-value">@Model.ReservedSimCards</div>
+        <div class="stat-label">رزرو شده</div>
+    </div>
+    <div class="stat-card">
+        <span class="stat-icon bg-slate-100 text-secondary"><svg data-lucide="package-check" class="w-5 h-5"></svg></span>
+        <div class="stat-value">@Model.SoldSimCards</div>
+        <div class="stat-label">فروخته‌شده</div>
+    </div>
+</div>
+
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="stat-card">
+        <span class="stat-icon bg-cyan-50 text-cyan"><svg data-lucide="shopping-cart" class="w-5 h-5"></svg></span>
+        <div class="stat-value">@Model.TotalOrders</div>
+        <div class="stat-label">تعداد سفارش‌ها</div>
+    </div>
+    <div class="stat-card">
+        <span class="stat-icon bg-primary-50 text-primary"><svg data-lucide="sparkle" class="w-5 h-5"></svg></span>
+        <div class="stat-value">@Model.NewOrders</div>
+        <div class="stat-label">سفارش‌های جدید</div>
+    </div>
+    <div class="stat-card">
+        <span class="stat-icon bg-success/10 text-success"><svg data-lucide="wallet" class="w-5 h-5"></svg></span>
+        <div class="stat-value">@Model.TotalSales.ToString("N0")</div>
+        <div class="stat-label">فروش (تکمیل‌شده) — تومان</div>
+    </div>
+    <div class="stat-card">
+        <span class="stat-icon bg-purple-50 text-purple"><svg data-lucide="message-square" class="w-5 h-5"></svg></span>
+        <div class="stat-value">@Model.SentSmsCount</div>
+        <div class="stat-label">پیامک‌های ارسال‌شده</div>
+    </div>
+</div>
+
+<div class="grid md:grid-cols-3 gap-6">
+    <div class="md:col-span-2 panel p-5">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-bold text-ink">آخرین سفارش‌ها</h2>
+            <a href="/Admin/Orders" class="text-sm text-primary font-semibold hover:text-primary-dark">مشاهده همه</a>
+        </div>
+
+        @if (Model.RecentOrders.Any())
+        {
+            <div class="table-wrap !shadow-none !border-0">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>کد سفارش</th>
+                            <th>شماره</th>
+                            <th>مشتری</th>
+                            <th>مبلغ</th>
+                            <th>وضعیت</th>
+                            <th>تاریخ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var order in Model.RecentOrders)
+                        {
+                            <tr>
+                                <td><a href="/Admin/Orders/Details/@order.Id" class="text-primary font-semibold">@order.OrderCode</a></td>
+                                <td dir="ltr">@(order.Items.FirstOrDefault()?.SimCard?.DisplayNumber ?? "-")</td>
+                                <td>@order.CustomerName</td>
+                                <td>@order.TotalAmount.ToString("N0")</td>
+                                <td>@DisplayLabels.OrderStatus(order.Status)</td>
+                                <td class="text-secondary text-xs">@order.CreatedAt.ToString("yyyy/MM/dd HH:mm")</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+        else
+        {
+            <p class="text-secondary text-sm">هنوز سفارشی ثبت نشده است.</p>
+        }
+    </div>
+
+    <div class="panel p-5">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="font-bold text-ink">برترین فروشندگان</h2>
+            <a href="/Admin/Users" class="text-sm text-primary font-semibold hover:text-primary-dark">همه کاربران</a>
+        </div>
+
+        @if (Model.TopSellers.Any())
+        {
+            <div class="space-y-3">
+                @foreach (var seller in Model.TopSellers)
+                {
+                    <div class="flex items-center justify-between text-sm">
+                        <div>
+                            <div class="font-medium text-ink" dir="ltr">@seller.Name</div>
+                            <div class="text-xs text-secondary">@seller.Count فروش</div>
+                        </div>
+                        <div class="font-bold text-ink">@seller.Total.ToString("N0")</div>
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <p class="text-secondary text-sm">هنوز فروشی ثبت نشده است.</p>
+        }
+    </div>
+</div>

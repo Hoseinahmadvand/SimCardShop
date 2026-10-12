@@ -1,0 +1,133 @@
+@{
+    var siteName = "شماره‌یاب";
+    var path = Context.Request.Path.Value ?? "/";
+    bool IsActive(string href) => href == "/" ? path == "/" : path.StartsWith(href, StringComparison.OrdinalIgnoreCase);
+}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@(ViewData["Title"] != null ? ViewData["Title"] + " | " + siteName : siteName + " | خرید شماره رند و مشابه")</title>
+    <meta name="description" content="@(ViewData["Description"] ?? "شماره‌های رند، مشابه و خاص همراه اول، ایرانسل و رایتل را جستجو و خریداری کنید.")" />
+    <link rel="canonical" href="@(ViewData["Canonical"] ?? $"{Context.Request.Scheme}://{Context.Request.Host}{Context.Request.Path}")" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="@(ViewData["Title"] ?? siteName)" />
+    <meta property="og:description" content="@(ViewData["Description"] ?? "شماره‌های رند و مشابه را جستجو و خریداری کنید.")" />
+    <meta property="og:locale" content="fa_IR" />
+    <meta name="theme-color" content="#2563EB" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide-static/0.474.0/umd/lucide.min.js" defer></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body class="min-h-screen flex flex-col bg-surface">
+
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:right-2 focus:z-[100] focus:bg-ink focus:text-white focus:px-4 focus:py-2 focus:rounded-lg">
+        رفتن به محتوای اصلی
+    </a>
+
+    <header class="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-line">
+        <div class="section">
+            <div class="flex h-16 md:h-[68px] items-center justify-between gap-4">
+
+                <a href="/" class="flex items-center gap-2.5 shrink-0" aria-label="@siteName">
+                    <span class="w-9 h-9 rounded-xl bg-primary-soft bg-primary text-white flex items-center justify-center font-extrabold shadow-softer">ش</span>
+                    <span class="font-extrabold text-lg text-ink hidden xs:inline">@siteName</span>
+                </a>
+
+                <nav class="hidden lg:flex items-center gap-1 text-sm font-semibold" aria-label="منوی اصلی">
+                    <a href="/" class="px-3 py-2 rounded-lg transition-colors @(IsActive("/") && path == "/" ? "text-primary bg-primary-50" : "text-secondary hover:text-ink hover:bg-slate-100")">صفحه اصلی</a>
+                    <a href="/simcards" class="px-3 py-2 rounded-lg transition-colors @(IsActive("/simcards") ? "text-primary bg-primary-50" : "text-secondary hover:text-ink hover:bg-slate-100")">جستجوی شماره</a>
+                    <a href="/simcards?randomness=special" class="px-3 py-2 rounded-lg transition-colors text-secondary hover:text-ink hover:bg-slate-100">شماره‌های ویژه</a>
+                    <a href="/services" class="px-3 py-2 rounded-lg transition-colors @(IsActive("/services") ? "text-primary bg-primary-50" : "text-secondary hover:text-ink hover:bg-slate-100")">خدمات</a>
+                    <a href="/Tracking" class="px-3 py-2 rounded-lg transition-colors @(IsActive("/tracking") ? "text-primary bg-primary-50" : "text-secondary hover:text-ink hover:bg-slate-100")">پیگیری سفارش</a>
+                    <a href="/about" class="px-3 py-2 rounded-lg transition-colors @(IsActive("/about") ? "text-primary bg-primary-50" : "text-secondary hover:text-ink hover:bg-slate-100")">درباره ما</a>
+                    <a href="/contact" class="px-3 py-2 rounded-lg transition-colors @(IsActive("/contact") ? "text-primary bg-primary-50" : "text-secondary hover:text-ink hover:bg-slate-100")">تماس با ما</a>
+                </nav>
+
+                <div class="hidden lg:flex items-center gap-2 shrink-0">
+                    <a href="/Admin/Login" class="btn-outline !px-4 !py-2 text-sm">
+                        <svg data-lucide="user" class="w-4 h-4"></svg>
+                        ورود
+                    </a>
+                </div>
+
+                <button id="mobile-menu-button" type="button" aria-expanded="false" aria-controls="mobile-menu" aria-label="باز کردن منو"
+                        class="lg:hidden inline-flex items-center justify-center w-10 h-10 rounded-xl hover:bg-slate-100 text-ink">
+                    <svg data-lucide="menu" class="w-5 h-5" id="menu-open-icon"></svg>
+                    <svg data-lucide="x" class="w-5 h-5 hidden" id="menu-close-icon"></svg>
+                </button>
+            </div>
+
+            <div id="mobile-menu" class="hidden lg:hidden pb-4 border-t border-line pt-3">
+                <nav class="flex flex-col gap-1 text-sm font-medium" aria-label="منوی موبایل">
+                    <a href="/" class="flex items-center gap-2.5 rounded-xl px-3 py-2.5 @(path == "/" ? "bg-primary-50 text-primary" : "text-ink hover:bg-slate-100")"><svg data-lucide="home" class="w-4 h-4"></svg>صفحه اصلی</a>
+                    <a href="/simcards" class="flex items-center gap-2.5 rounded-xl px-3 py-2.5 @(IsActive("/simcards") ? "bg-primary-50 text-primary" : "text-ink hover:bg-slate-100")"><svg data-lucide="search" class="w-4 h-4"></svg>جستجوی شماره</a>
+                    <a href="/simcards?randomness=rare" class="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-ink hover:bg-slate-100"><svg data-lucide="sparkles" class="w-4 h-4"></svg>شماره‌های رند</a>
+                    <a href="/simcards?randomness=special" class="flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-ink hover:bg-slate-100"><svg data-lucide="star" class="w-4 h-4"></svg>شماره‌های ویژه</a>
+                    <a href="/services" class="flex items-center gap-2.5 rounded-xl px-3 py-2.5 @(IsActive("/services") ? "bg-primary-50 text-primary" : "text-ink hover:bg-slate-100")"><svg data-lucide="briefcase" class="w-4 h-4"></svg>خدمات</a>     
+                    <a href="/Tracking" class="flex items-center gap-2.5 rounded-xl px-3 py-2.5 @(IsActive("/tracking") ? "bg-primary-50 text-primary" : "text-ink hover:bg-slate-100")"><svg data-lucide="briefcase" class="w-4 h-4"></svg>پیگیری سفارش</a>
+                    <a href="/about" class="flex items-center gap-2.5 rounded-xl px-3 py-2.5 @(IsActive("/about") ? "bg-primary-50 text-primary" : "text-ink hover:bg-slate-100")"><svg data-lucide="info" class="w-4 h-4"></svg>درباره ما</a>
+                    <a href="/contact" class="flex items-center gap-2.5 rounded-xl px-3 py-2.5 @(IsActive("/contact") ? "bg-primary-50 text-primary" : "text-ink hover:bg-slate-100")"><svg data-lucide="phone" class="w-4 h-4"></svg>تماس با ما</a>
+                    <a href="/Admin/Login" class="flex items-center justify-center gap-2 rounded-xl px-3 py-2.5 mt-2 bg-ink text-white font-semibold"><svg data-lucide="user" class="w-4 h-4"></svg>ورود / ثبت‌نام</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="flex-1">
+        @RenderBody()
+    </main>
+
+    <footer class="bg-ink text-white/70 mt-20">
+        <div class="section py-14 grid grid-cols-1 md:grid-cols-4 gap-10">
+            <div class="md:col-span-1">
+                <div class="flex items-center gap-2.5 mb-4">
+                    <span class="w-9 h-9 rounded-xl bg-primary text-white flex items-center justify-center font-extrabold">ش</span>
+                    <span class="font-extrabold text-white text-lg">@siteName</span>
+                </div>
+                <p class="text-sm leading-7 text-white/50">خرید و فروش شماره‌های رند، مشابه و خاص همراه اول، ایرانسل و رایتل با فرآیندی شفاف و امن.</p>
+            </div>
+            <div>
+                <h3 class="text-white font-bold mb-4 text-sm">دسترسی سریع</h3>
+                <ul class="space-y-2.5 text-sm">
+                    <li><a href="/simcards" class="hover:text-gold-light transition-colors">جستجوی شماره</a></li>
+                    <li><a href="/simcards?randomness=rare" class="hover:text-gold-light transition-colors">شماره‌های رند</a></li>
+                    <li><a href="/services" class="hover:text-gold-light transition-colors">خدمات دفتر</a></li>
+                    <li><a href="/about" class="hover:text-gold-light transition-colors">درباره ما</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-white font-bold mb-4 text-sm">اپراتورها</h3>
+                <ul class="space-y-2.5 text-sm">
+                    <li><a href="/simcards?operator=hamrahaval" class="hover:text-gold-light transition-colors">همراه اول</a></li>
+                    <li><a href="/simcards?operator=irancell" class="hover:text-gold-light transition-colors">ایرانسل</a></li>
+                    <li><a href="/simcards?operator=rightel" class="hover:text-gold-light transition-colors">رایتل</a></li>
+                </ul>
+            </div>
+            <div>
+                <h3 class="text-white font-bold mb-4 text-sm">ارتباط با ما</h3>
+                <ul class="space-y-2.5 text-sm">
+                    <li class="flex items-center gap-2"><svg data-lucide="phone" class="w-4 h-4 text-white/40"></svg><span dir="ltr">۰۲۱-۱۲۳۴۵۶۷۸</span></li>
+                    <li class="flex items-center gap-2"><svg data-lucide="smartphone" class="w-4 h-4 text-white/40"></svg><span dir="ltr">۰۹۱۲۰۰۰۰۰۰۰</span></li>
+                    <li><a href="/contact" class="hover:text-gold-light transition-colors">فرم تماس با ما</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-white/10 py-5">
+            <div class="section flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-white/40">
+                <span>© @DateTime.Now.Year @siteName - تمامی حقوق محفوظ است.</span>
+                <span class="flex items-center gap-1.5"><svg data-lucide="shield-check" class="w-3.5 h-3.5"></svg>خرید امن و ضمانت‌شده</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

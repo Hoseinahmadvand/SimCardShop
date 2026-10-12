@@ -1,0 +1,17 @@
+@page
+@model SimCardShop.Pages.ErrorModel
+@{
+    ViewData["Title"] = "خطا";
+}
+
+<section class="section max-w-xl py-24 text-center">
+    <span class="w-14 h-14 mx-auto rounded-2xl bg-warning/10 text-warning flex items-center justify-center mb-5">
+        <svg data-lucide="triangle-alert" class="w-7 h-7"></svg>
+    </span>
+    <h1 class="text-2xl font-extrabold text-ink mb-3">مشکلی پیش آمد</h1>
+    <p class="text-secondary mb-8">لطفاً دوباره تلاش کنید یا به صفحه اصلی بازگردید.</p>
+    <a href="/" class="btn-primary">
+        <svg data-lucide="home" class="w-4 h-4"></svg>
+        بازگشت به صفحه اصلی
+    </a>
+</section>

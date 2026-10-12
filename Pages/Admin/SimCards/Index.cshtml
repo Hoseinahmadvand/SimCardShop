@@ -1,0 +1,127 @@
+@page "/Admin/SimCards"
+@model SimCardShop.Pages.Admin.SimCards.IndexModel
+@{
+    ViewData["Title"] = "مدیریت شماره‌ها";
+}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-xl font-extrabold text-ink">مدیریت شماره‌ها</h1>
+    <a href="/Admin/SimCards/Create" class="btn-accent !py-2 !px-5 text-sm">افزودن شماره جدید</a>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="rounded-xl bg-emerald-50 text-emerald-800 text-sm p-3 mb-5">@Model.StatusMessage</div>
+}
+
+<form method="get" class="card-base p-4 mb-6 flex flex-wrap gap-3">
+    <input type="text" name="q" value="@Model.Q" placeholder="جستجوی شماره..." dir="ltr"
+           class="field-input !py-2 w-56 text-right" />
+    <select name="status" class="field-select text-sm">
+        <option value="">همه وضعیت‌ها</option>
+        <option value="Available" selected="@(Model.Status == "Available")">موجود</option>
+        <option value="Reserved" selected="@(Model.Status == "Reserved")">رزرو شده</option>
+        <option value="Sold" selected="@(Model.Status == "Sold")">فروخته شده</option>
+        <option value="Disabled" selected="@(Model.Status == "Disabled")">غیرفعال</option>
+    </select>
+    <button type="submit" class="btn-primary !py-2 !px-5 text-sm">فیلتر</button>
+    <a href="/Admin/SimCards" class="text-sm text-muted self-center">حذف فیلتر</a>
+</form>
+
+<div class="table-wrap">
+    <table class="table-modern w-full text-sm">
+        <thead>
+            <tr class="text-muted text-right border-b border-slate-100">
+                <th class="py-3 px-4 font-medium">شماره</th>
+                <th class="py-3 px-4 font-medium">اپراتور</th>
+                <th class="py-3 px-4 font-medium">نوع رندی</th>
+                <th class="py-3 px-4 font-medium">قیمت</th>
+                <th class="py-3 px-4 font-medium">وضعیت</th>
+                <th class="py-3 px-4 font-medium">ویژه</th>
+                <th class="py-3 px-4 font-medium">عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sim in Model.Results)
+            {
+                <tr class="border-b border-slate-50 align-middle">
+                    <td class="py-3 px-4">
+                        <div class="number-plate text-base">@sim.DisplayNumber</div>
+                    </td>
+                    <td class="py-3 px-4">@DisplayLabels.Operator(sim.Operator)</td>
+                    <td class="py-3 px-4">@DisplayLabels.Randomness(sim.RandomnessType)</td>
+                    <td class="py-3 px-4">@sim.FinalPrice.ToString("N0")</td>
+                    <td class="py-3 px-4">
+                        <form method="post" asp-page-handler="ChangeStatus" asp-route-id="@sim.Id" class="inline">
+                            <select name="newStatus" onchange="this.form.submit()"
+                                    class="rounded-lg border border-slate-200 px-2 py-1 text-xs">
+                                <option value="Available" selected="@(sim.Status == SimCardStatus.Available)">موجود</option>
+                                <option value="Reserved" selected="@(sim.Status == SimCardStatus.Reserved)">رزرو شده</option>
+                                <option value="Sold" selected="@(sim.Status == SimCardStatus.Sold)">فروخته شده</option>
+                                <option value="Disabled" selected="@(sim.Status == SimCardStatus.Disabled)">غیرفعال</option>
+                            </select>
+                        </form>
+                    </td>
+                    <td class="py-3 px-4">
+                        <form method="post" asp-page-handler="ToggleFeatured" asp-route-id="@sim.Id">
+                            <button type="submit" class="text-lg" title="ویژه/عادی">
+                                @(sim.IsFeatured ? "⭐" : "☆")
+                            </button>
+                        </form>
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center gap-3">
+                            <a href="/Admin/SimCards/Edit/@sim.Id" class="text-primary font-semibold">ویرایش</a>
+                            <a href="/Admin/Sms/Send?simCardId=@sim.Id" class="text-primary font-semibold">ارسال پیامک</a>
+                            <button type="button" class="text-muted" data-copy-link="https://example.ir/i/@sim.Number">کپی لینک</button>
+                            <button type="button" class="text-muted" data-copy-sms="@sim.Number|@sim.FinalPrice">کپی متن SMS</button>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@sim.Id"
+                                  onsubmit="return confirm('آیا از حذف این شماره مطمئن هستید؟');" class="inline">
+                                <button type="submit" class="text-danger">حذف</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <div class="flex items-center justify-center gap-2 mt-6">
+        @for (int p = 1; p <= Model.TotalPages; p++)
+        {
+            var isCurrent = p == Model.Page;
+            <a href="?q=@Model.Q&status=@Model.Status&page=@p"
+               class="w-9 h-9 flex items-center justify-center rounded-full text-sm @(isCurrent ? "bg-primary text-white" : "text-secondary hover:bg-slate-100")">
+                @p
+            </a>
+        }
+    </div>
+}
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('[data-copy-link]').forEach(function (btn) {
+            btn.addEventListener('click', async function () {
+                await navigator.clipboard.writeText(btn.getAttribute('data-copy-link'));
+                var original = btn.textContent;
+                btn.textContent = 'کپی شد!';
+                setTimeout(function () { btn.textContent = original; }, 1500);
+            });
+        });
+        document.querySelectorAll('[data-copy-sms]').forEach(function (btn) {
+            btn.addEventListener('click', async function () {
+                var parts = btn.getAttribute('data-copy-sms').split('|');
+                var number = parts[0];
+                var price = Number(parts[1]).toLocaleString('fa-IR');
+                var text = '❤️ فروش شماره: ' + number + '\nقیمت: ' + price + ' تومان\nمشاهده و خرید:\nhttps://example.ir/i/' + number + '\n\nلغو11';
+                await navigator.clipboard.writeText(text);
+                var original = btn.textContent;
+                btn.textContent = 'کپی شد!';
+                setTimeout(function () { btn.textContent = original; }, 1500);
+            });
+        });
+    </script>
+}

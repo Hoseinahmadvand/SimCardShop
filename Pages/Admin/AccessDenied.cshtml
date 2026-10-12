@@ -1,0 +1,18 @@
+@page "/Admin/AccessDenied"
+@model SimCardShop.Pages.Admin.AccessDeniedModel
+@{
+    ViewData["Title"] = "دسترسی محدود";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<section class="section max-w-md py-24 text-center">
+    <span class="w-14 h-14 mx-auto rounded-2xl bg-danger/10 text-danger flex items-center justify-center mb-5">
+        <svg data-lucide="shield-x" class="w-7 h-7"></svg>
+    </span>
+    <h1 class="text-xl font-extrabold text-ink mb-2">دسترسی محدود است</h1>
+    <p class="text-secondary mb-8">شما اجازه دسترسی به این بخش را ندارید.</p>
+    <a href="/" class="btn-primary">
+        <svg data-lucide="home" class="w-4 h-4"></svg>
+        بازگشت به صفحه اصلی
+    </a>
+</section>

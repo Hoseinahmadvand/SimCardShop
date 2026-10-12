@@ -1,0 +1,160 @@
+@page "/Admin/Sms/Send"
+@model SimCardShop.Pages.Admin.Sms.SendModel
+@{
+    ViewData["Title"] = "ارسال پیامک تبلیغاتی";
+}
+
+<div class="flex items-center gap-3 mb-6">
+    <h1 class="text-xl font-extrabold text-ink">ارسال پیامک تبلیغاتی</h1>
+    <a href="/Admin/Sms/History" class="text-sm text-gold-dark mr-auto">تاریخچه پیامک‌ها</a>
+    <a href="/Admin/Sms/Templates" class="text-sm text-gold-dark">قالب‌های پیامک</a>
+</div>
+
+@if (Model.SendCompleted)
+{
+    <div class="card-base p-6 mb-6 bg-emerald-50 border-emerald-100">
+        <h2 class="font-bold text-emerald-800 mb-2">ارسال کمپین به پایان رسید</h2>
+        <p class="text-sm text-emerald-800">
+            @Model.SentCount پیامک با موفقیت ارسال شد
+            @if (Model.FailedCount > 0)
+            {
+                <span>و @Model.FailedCount پیامک ناموفق بود.</span>
+            }
+        </p>
+        <a href="/Admin/Sms/History" class="btn-primary !py-2 !px-5 text-sm inline-block mt-4">مشاهده در تاریخچه</a>
+    </div>
+}
+
+<div class="grid md:grid-cols-3 gap-6">
+
+    <form method="post" asp-page-handler="Preview" enctype="multipart/form-data" class="md:col-span-2 card-base p-6 md:p-8">
+        <div asp-validation-summary="ModelOnly" class="field-error mb-4"></div>
+
+        <div class="mb-5">
+            <label class="field-label">شماره تبلیغ‌شونده (اختیاری)</label>
+            <select name="Input.SimCardId" class="field-input">
+                <option value="">— بدون شماره خاص (کمپین عمومی) —</option>
+                @foreach (var sim in Model.AvailableSimCards)
+                {
+                    <option value="@sim.Id" selected="@(Model.Input.SimCardId == sim.Id)">
+                        @sim.DisplayNumber — @DisplayLabels.Operator(sim.Operator) — @sim.FinalPrice.ToString("N0") تومان
+                    </option>
+                }
+            </select>
+            <p class="text-xs text-muted mt-1">در صورت انتخاب شماره، فیلدهای {Number}، {Price} و {Link} در متن پیامک جایگزین می‌شوند.</p>
+        </div>
+
+        @if (Model.Templates.Any())
+        {
+            <div class="mb-5">
+                <label class="field-label">شروع از یک قالب آماده</label>
+                <select id="template-picker" class="field-input">
+                    <option value="">— انتخاب قالب —</option>
+                    @foreach (var t in Model.Templates)
+                    {
+                        <option value="@t.Text.Replace("\r", "").Replace("\n", "\\n")">@t.Name</option>
+                    }
+                </select>
+            </div>
+        }
+
+        <div class="mb-5">
+            <label asp-for="Input.MessageTemplate" class="field-label"></label>
+            <textarea asp-for="Input.MessageTemplate" id="message-textarea" rows="6"
+                      class="field-input" dir="rtl"></textarea>
+            <span asp-validation-for="Input.MessageTemplate" class="field-error"></span>
+        </div>
+
+        <div class="mb-5">
+            <label asp-for="Input.RecipientsText" class="field-label"></label>
+            <textarea asp-for="Input.RecipientsText" rows="5" dir="ltr" placeholder="09120000001&#10;09120000002&#10;09120000003"
+                      class="field-input text-right"></textarea>
+            <span asp-validation-for="Input.RecipientsText" class="field-error"></span>
+        </div>
+
+        <div class="mb-6">
+            <label asp-for="Input.CsvFile" class="field-label"></label>
+            <input asp-for="Input.CsvFile" type="file" accept=".csv,.txt"
+                   class="field-input" />
+        </div>
+
+        <button type="submit" class="btn-primary">پیش‌نمایش و بررسی</button>
+    </form>
+
+    <div class="card-base p-6">
+        <h2 class="font-bold mb-3">راهنما</h2>
+        <ul class="text-sm text-muted leading-7 list-disc pr-5">
+            <li>شماره‌های ثبت‌شده در «لیست عدم ارسال» به‌طور خودکار از ارسال حذف می‌شوند.</li>
+            <li>قبل از ارسال نهایی، حتماً پیش‌نمایش را بررسی و تأیید کنید.</li>
+            <li>در نسخه فعلی، در صورت نبودن اتصال واقعی به پنل پیامک، ارسال به‌صورت آزمایشی (Mock) ثبت می‌شود.</li>
+        </ul>
+    </div>
+</div>
+
+@if (Model.PreviewReady)
+{
+    <div class="card-base p-6 md:p-8 mt-6 border-2 border-gold/40">
+        <h2 class="font-bold text-lg mb-4">پیش‌نمایش ارسال</h2>
+
+        <div class="grid sm:grid-cols-3 gap-4 mb-5">
+            <div class="rounded-xl bg-surface p-4 text-center">
+                <div class="text-2xl font-extrabold">@Model.PreviewRecipients.Count</div>
+                <div class="text-xs text-muted mt-1">تعداد گیرندگان معتبر</div>
+            </div>
+            <div class="rounded-xl bg-surface p-4 text-center">
+                <div class="text-2xl font-extrabold">@Model.PreviewSegmentCount</div>
+                <div class="text-xs text-muted mt-1">تعداد پیامک به ازای هر گیرنده</div>
+            </div>
+            <div class="rounded-xl bg-surface p-4 text-center">
+                <div class="text-2xl font-extrabold">@(Model.PreviewRecipients.Count * Model.PreviewSegmentCount)</div>
+                <div class="text-xs text-muted mt-1">مجموع پیامک ارسالی تقریبی</div>
+            </div>
+        </div>
+
+        @if (Model.SkippedOptedOutCount > 0 || Model.SkippedInvalidCount > 0)
+        {
+            <div class="rounded-xl bg-amber-50 text-amber-800 text-sm p-3 mb-5">
+                @if (Model.SkippedOptedOutCount > 0)
+                {
+                    <div>@Model.SkippedOptedOutCount شماره به دلیل ثبت در لیست عدم ارسال، حذف شد.</div>
+                }
+                @if (Model.SkippedInvalidCount > 0)
+                {
+                    <div>@Model.SkippedInvalidCount شماره به دلیل فرمت نامعتبر، نادیده گرفته شد.</div>
+                }
+            </div>
+        }
+
+        <div class="mb-5">
+            <div class="field-label">متن نهایی پیامک:</div>
+            <div class="rounded-xl bg-navy text-white p-4 whitespace-pre-line text-sm leading-7">@Model.PreviewMessage</div>
+        </div>
+
+        <form method="post" asp-page-handler="Send">
+            <input type="hidden" asp-for="Input.ConfirmedRecipients" />
+            <input type="hidden" asp-for="Input.ConfirmedMessage" />
+            <input type="hidden" asp-for="Input.SimCardId" />
+
+            <label class="flex items-center gap-2 mb-4 text-sm">
+                <input type="checkbox" required class="rounded" />
+                تأیید می‌کنم که متن و تعداد گیرندگان بالا را بررسی کرده‌ام و مایل به ارسال هستم.
+            </label>
+
+            <button type="submit" class="btn-accent">ارسال پیامک</button>
+        </form>
+    </div>
+}
+
+@section Scripts {
+    <script>
+        var picker = document.getElementById('template-picker');
+        var textarea = document.getElementById('message-textarea');
+        if (picker && textarea) {
+            picker.addEventListener('change', function () {
+                if (picker.value) {
+                    textarea.value = picker.value.replace(/\\n/g, '\n');
+                }
+            });
+        }
+    </script>
+}

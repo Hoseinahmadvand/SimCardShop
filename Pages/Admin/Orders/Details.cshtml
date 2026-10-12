@@ -1,0 +1,130 @@
+@page "/Admin/Orders/Details/{id:int}"
+@model SimCardShop.Pages.Admin.Orders.DetailsModel
+@{
+    ViewData["Title"] = "جزئیات سفارش " + Model.Order.OrderCode;
+}
+
+<div class="flex items-center gap-3 mb-6">
+    <a href="/Admin/Orders" class="text-muted text-sm">مدیریت سفارش‌ها</a>
+    <span class="text-muted">/</span>
+    <h1 class="text-xl font-extrabold text-ink">سفارش @Model.Order.OrderCode</h1>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="rounded-xl bg-emerald-50 text-emerald-800 text-sm p-3 mb-5">@Model.StatusMessage</div>
+}
+
+<div class="grid md:grid-cols-3 gap-5">
+
+    <div class="md:col-span-2 card-base p-6">
+        <h2 class="font-bold text-ink mb-4">اطلاعات سفارش</h2>
+        <dl class="grid grid-cols-2 gap-y-3 text-sm">
+            <dt class="text-muted">نام مشتری</dt>
+            <dd>
+                @Model.Order.CustomerName
+                @if (Model.Order.CustomerId.HasValue)
+                {
+                    <a href="/Admin/Crm/Details/@Model.Order.CustomerId" class="text-sm text-gold-dark mr-2">(مشاهده پروفایل CRM)</a>
+                }
+            </dd>
+
+            <dt class="text-muted">موبایل</dt>
+            <dd dir="ltr">@Model.Order.CustomerMobile</dd>
+
+            <dt class="text-muted">مبلغ کل</dt>
+            <dd>@Model.Order.TotalAmount.ToString("N0") تومان</dd>
+
+            <dt class="text-muted">تاریخ ثبت</dt>
+            <dd>@Model.Order.CreatedAt.ToString("yyyy/MM/dd HH:mm")</dd>
+
+            <dt class="text-muted">پرداخت</dt>
+            <dd>
+                @if (Model.Order.IsPaid)
+                {
+                    <span class="badge-success">پرداخت‌شده @(string.IsNullOrEmpty(Model.Order.PaymentGateway) ? "" : $"({Model.Order.PaymentGateway})")</span>
+                }
+                else if (!string.IsNullOrEmpty(Model.Order.PaymentAuthority))
+                {
+                    <span class="badge-warning">در انتظار تایید پرداخت</span>
+                }
+                else
+                {
+                    <span class="badge-neutral">آفلاین / پیگیری تلفنی</span>
+                }
+            </dd>
+
+            @if (!string.IsNullOrEmpty(Model.Order.PaymentRefId))
+            {
+                <dt class="text-muted">کد پیگیری تراکنش</dt>
+                <dd dir="ltr" class="font-semibold">@Model.Order.PaymentRefId</dd>
+            }
+
+            @if (Model.Order.PaidAt.HasValue)
+            {
+                <dt class="text-muted">زمان پرداخت</dt>
+                <dd>@Model.Order.PaidAt.Value.ToString("yyyy/MM/dd HH:mm")</dd>
+            }
+
+            @if (!string.IsNullOrWhiteSpace(Model.Order.Notes))
+            {
+                <dt class="text-muted">توضیحات</dt>
+                <dd>@Model.Order.Notes</dd>
+            }
+        </dl>
+
+        <h3 class="font-bold mt-6 mb-3">شماره(های) سفارش</h3>
+        <div class="space-y-2">
+            @foreach (var item in Model.Order.Items)
+            {
+                <div class="flex items-center justify-between rounded-xl bg-surface px-4 py-3">
+                    <div class="number-plate text-base">@(item.SimCard?.DisplayNumber ?? "-")</div>
+                    <div class="text-sm text-muted">@item.PriceAtPurchase.ToString("N0") تومان</div>
+                    @if (item.SimCard is not null)
+                    {
+                        <a href="/i/@item.SimCard.Number" class="text-sm text-gold-dark">مشاهده صفحه شماره</a>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="card-base p-6">
+        <h2 class="font-bold text-ink mb-4">وضعیت سفارش</h2>
+        <p class="text-sm text-muted mb-4">وضعیت فعلی: <span class="chip">@DisplayLabels.OrderStatus(Model.Order.Status)</span></p>
+
+        <form method="post" asp-page-handler="ChangeStatus" asp-route-id="@Model.Order.Id" class="space-y-3">
+            <select name="newStatus" class="field-input">
+                <option value="New" selected="@(Model.Order.Status == OrderStatus.New)">جدید</option>
+                <option value="Paid" selected="@(Model.Order.Status == OrderStatus.Paid)">پرداخت شده</option>
+                <option value="InProgress" selected="@(Model.Order.Status == OrderStatus.InProgress)">در حال انجام</option>
+                <option value="Completed" selected="@(Model.Order.Status == OrderStatus.Completed)">تکمیل شده</option>
+                <option value="Cancelled" selected="@(Model.Order.Status == OrderStatus.Cancelled)">لغو شده</option>
+            </select>
+            <button type="submit" class="btn-primary w-full">به‌روزرسانی وضعیت</button>
+        </form>
+
+        <p class="text-xs text-muted mt-4 leading-6">
+            با انتخاب «تکمیل شده»، شماره مربوطه به‌صورت خودکار «فروخته شده» علامت می‌خورد.
+            با انتخاب «لغو شده»، در صورتی که شماره فقط برای همین سفارش رزرو شده باشد، دوباره «موجود» می‌شود.
+        </p>
+    </div>
+
+    <div class="md:col-span-3 card-base p-6">
+        <h2 class="font-bold text-ink mb-4">فروشنده مسئول این سفارش</h2>
+        <p class="text-sm text-muted mb-4">
+            فروش، پس از تکمیل سفارش، به‌طور خودکار به کاربری که وضعیت را «تکمیل شده» کرده نسبت داده می‌شود.
+            در صورت نیاز می‌توانید آن را دستی تغییر دهید.
+        </p>
+        <form method="post" asp-page-handler="AssignSeller" asp-route-id="@Model.Order.Id" class="flex flex-wrap items-center gap-3">
+            <select name="userId" class="field-select">
+                <option value="">— بدون فروشنده مشخص —</option>
+                @foreach (var u in Model.StaffUsers)
+                {
+                    <option value="@u.Id" selected="@(Model.Order.HandledByUserId == u.Id)">@(u.DisplayName ?? u.Email)</option>
+                }
+            </select>
+            <button type="submit" class="btn-outline">ذخیره فروشنده</button>
+        </form>
+    </div>
+</div>

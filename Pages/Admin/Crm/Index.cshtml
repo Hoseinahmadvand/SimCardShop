@@ -1,0 +1,107 @@
+@page "/Admin/Crm"
+@model SimCardShop.Pages.Admin.Crm.IndexModel
+@{
+    ViewData["Title"] = "مشتریان (CRM)";
+}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-xl font-extrabold text-ink">مشتریان و سرنخ‌ها</h1>
+    <a href="/Admin/Crm/Create" class="btn-accent !py-2 !px-5 text-sm">افزودن مشتری جدید</a>
+</div>
+
+@if (Model.FollowUpTodayCount > 0)
+{
+    <div class="rounded-xl bg-amber-50 text-amber-800 text-sm p-3 mb-5 flex items-center justify-between">
+        <span>@Model.FollowUpTodayCount مشتری امروز یا قبل‌تر باید پیگیری شوند.</span>
+        <a href="/Admin/Crm?followUpOnly=true" class="font-medium">مشاهده لیست</a>
+    </div>
+}
+
+<form method="get" class="card-base p-4 mb-6 flex flex-wrap gap-3">
+    <input type="text" name="q" value="@Model.Q" placeholder="نام یا شماره موبایل..."
+           class="field-input !py-2 w-64" />
+
+    <select name="status" class="field-select text-sm">
+        <option value="">همه وضعیت‌ها</option>
+        <option value="Lead" selected="@(Model.Status == "Lead")">سرنخ جدید</option>
+        <option value="Contacted" selected="@(Model.Status == "Contacted")">در حال پیگیری</option>
+        <option value="Customer" selected="@(Model.Status == "Customer")">مشتری</option>
+        <option value="Lost" selected="@(Model.Status == "Lost")">از دست رفته</option>
+    </select>
+
+    <select name="assignedTo" class="field-select text-sm">
+        <option value="">همه کارشناسان</option>
+        @foreach (var u in Model.StaffUsers)
+        {
+            <option value="@u.Id" selected="@(Model.AssignedTo == u.Id)">@(u.DisplayName ?? u.Email)</option>
+        }
+    </select>
+
+    <label class="flex items-center gap-2 text-sm">
+        <input type="checkbox" name="followUpOnly" value="true" checked="@Model.FollowUpOnly" class="rounded" />
+        فقط نیازمند پیگیری
+    </label>
+
+    <button type="submit" class="btn-primary !py-2 !px-5 text-sm">فیلتر</button>
+    <a href="/Admin/Crm" class="text-sm text-muted self-center">حذف فیلتر</a>
+</form>
+
+<div class="table-wrap">
+    <table class="table-modern w-full text-sm">
+        <thead>
+            <tr class="text-muted text-right border-b border-slate-100">
+                <th class="py-3 px-4 font-medium">نام</th>
+                <th class="py-3 px-4 font-medium">موبایل</th>
+                <th class="py-3 px-4 font-medium">وضعیت</th>
+                <th class="py-3 px-4 font-medium">کارشناس مسئول</th>
+                <th class="py-3 px-4 font-medium">پیگیری بعدی</th>
+                <th class="py-3 px-4 font-medium"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var c in Model.Results)
+            {
+                <tr class="border-b border-slate-50 @(c.NeedsFollowUpToday ? "bg-amber-50/40" : "")">
+                    <td class="py-3 px-4 font-medium">@c.FullName</td>
+                    <td class="py-3 px-4" dir="ltr">@c.Mobile</td>
+                    <td class="py-3 px-4"><span class="chip">@DisplayLabels.CustomerStatus(c.Status)</span></td>
+                    <td class="py-3 px-4">@(c.AssignedToUser?.DisplayName ?? c.AssignedToUser?.Email ?? "—")</td>
+                    <td class="py-3 px-4">
+                        @if (c.NextFollowUpAt.HasValue)
+                        {
+                            <span class="@(c.NeedsFollowUpToday ? "text-amber-700 font-medium" : "text-muted")">
+                                @c.NextFollowUpAt.Value.ToString("yyyy/MM/dd")
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">—</span>
+                        }
+                    </td>
+                    <td class="py-3 px-4">
+                        <a href="/Admin/Crm/Details/@c.Id" class="text-primary font-semibold">مشاهده پروفایل</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!Model.Results.Any())
+    {
+        <p class="text-muted text-sm p-6 text-center">مشتری‌ای یافت نشد.</p>
+    }
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <div class="flex items-center justify-center gap-2 mt-6">
+        @for (int p = 1; p <= Model.TotalPages; p++)
+        {
+            var isCurrent = p == Model.Page;
+            <a href="?q=@Model.Q&status=@Model.Status&assignedTo=@Model.AssignedTo&page=@p"
+               class="w-9 h-9 flex items-center justify-center rounded-full text-sm @(isCurrent ? "bg-primary text-white" : "text-secondary hover:bg-slate-100")">
+                @p
+            </a>
+        }
+    </div>
+}

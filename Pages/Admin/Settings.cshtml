@@ -1,0 +1,115 @@
+@page "/Admin/Settings"
+@model SimCardShop.Pages.Admin.SettingsModel
+@{
+    ViewData["Title"] = "تنظیمات سایت";
+}
+
+<h1 class="text-xl font-extrabold text-ink mb-6">تنظیمات سایت</h1>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="rounded-xl bg-emerald-50 text-emerald-800 text-sm p-3 mb-5">@Model.StatusMessage</div>
+}
+
+<form method="post" class="grid md:grid-cols-2 gap-6 max-w-4xl">
+
+    <div class="card-base p-6">
+        <h2 class="font-bold text-ink mb-4">اطلاعات دفتر</h2>
+        <div class="space-y-4">
+            <div>
+                <label asp-for="Input.OfficeName" class="field-label"></label>
+                <input asp-for="Input.OfficeName" class="field-input" />
+                <span asp-validation-for="Input.OfficeName" class="field-error"></span>
+            </div>
+            <div>
+                <label asp-for="Input.LogoUrl" class="field-label"></label>
+                <input asp-for="Input.LogoUrl" dir="ltr" class="field-input text-right" />
+            </div>
+            <div>
+                <label asp-for="Input.Phone" class="field-label"></label>
+                <input asp-for="Input.Phone" dir="ltr" class="field-input text-right" />
+            </div>
+            <div>
+                <label asp-for="Input.Mobile" class="field-label"></label>
+                <input asp-for="Input.Mobile" dir="ltr" class="field-input text-right" />
+            </div>
+            <div>
+                <label asp-for="Input.Address" class="field-label"></label>
+                <textarea asp-for="Input.Address" rows="2" class="field-input"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-base p-6">
+        <h2 class="font-bold text-ink mb-4">شبکه‌های اجتماعی و نقشه</h2>
+        <div class="space-y-4">
+            <div>
+                <label asp-for="Input.WhatsAppUrl" class="field-label"></label>
+                <input asp-for="Input.WhatsAppUrl" dir="ltr" class="field-input text-right" />
+            </div>
+            <div>
+                <label asp-for="Input.TelegramUrl" class="field-label"></label>
+                <input asp-for="Input.TelegramUrl" dir="ltr" class="field-input text-right" />
+            </div>
+            <div>
+                <label asp-for="Input.InstagramUrl" class="field-label"></label>
+                <input asp-for="Input.InstagramUrl" dir="ltr" class="field-input text-right" />
+            </div>
+            <div>
+                <label asp-for="Input.MapUrl" class="field-label"></label>
+                <input asp-for="Input.MapUrl" dir="ltr" class="field-input text-right" />
+            </div>
+        </div>
+    </div>
+
+    <div class="card-base p-6 md:col-span-2">
+        <h2 class="font-bold text-ink mb-1">اتصال پنل پیامک</h2>
+        <p class="text-xs text-muted mb-4">تا زمانی که این فیلدها خالی باشند، ارسال پیامک به‌صورت آزمایشی (Mock) ثبت می‌شود.</p>
+        <div class="grid md:grid-cols-3 gap-4">
+            <div>
+                <label asp-for="Input.SmsApiUrl" class="field-label"></label>
+                <input asp-for="Input.SmsApiUrl" dir="ltr" class="field-input text-right" />
+            </div>
+            <div>
+                <label asp-for="Input.SmsApiKey" class="field-label"></label>
+                <input asp-for="Input.SmsApiKey" dir="ltr" type="password" class="field-input text-right" />
+            </div>
+            <div>
+                <label asp-for="Input.SmsSenderNumber" class="field-label"></label>
+                <input asp-for="Input.SmsSenderNumber" dir="ltr" class="field-input text-right" />
+            </div>
+        </div>
+    </div>
+
+    <div class="card-base p-6 md:col-span-2">
+        <div class="flex items-center justify-between mb-1">
+            <h2 class="font-bold text-ink flex items-center gap-2">
+                <svg data-lucide="credit-card" class="w-4 h-4 text-primary"></svg>
+                درگاه پرداخت (زرین‌پال)
+            </h2>
+            <label class="inline-flex items-center gap-2 text-sm font-medium text-ink cursor-pointer">
+                <input asp-for="Input.PaymentEnabled" class="w-4 h-4 rounded border-line accent-primary focus:ring-2 focus:ring-primary/20" />
+                فعال باشد
+            </label>
+        </div>
+        <p class="text-xs text-muted mb-4">
+            تا زمانی که این گزینه غیرفعال باشد یا کد پذیرنده خالی باشد، خریدها مانند قبل به‌صورت ثبت سفارش و پیگیری تلفنی انجام می‌شود؛
+            پس از تکمیل این تنظیمات، مشتری هنگام خرید مستقیم به درگاه بانکی هدایت می‌شود.
+        </p>
+        <div class="grid md:grid-cols-3 gap-4 items-end">
+            <div class="md:col-span-2">
+                <label asp-for="Input.ZarinPalMerchantId" class="field-label"></label>
+                <input asp-for="Input.ZarinPalMerchantId" dir="ltr" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" class="field-input text-right" />
+                <span asp-validation-for="Input.ZarinPalMerchantId" class="field-error"></span>
+            </div>
+            <label class="inline-flex items-center gap-2 text-sm text-ink pb-2.5 cursor-pointer">
+                <input asp-for="Input.ZarinPalSandbox" class="w-4 h-4 rounded border-line accent-primary focus:ring-2 focus:ring-primary/20" />
+                حالت آزمایشی (Sandbox)
+            </label>
+        </div>
+    </div>
+
+    <div class="md:col-span-2">
+        <button type="submit" class="btn-accent">ذخیره تنظیمات</button>
+    </div>
+</form>

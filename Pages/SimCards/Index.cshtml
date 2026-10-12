@@ -1,0 +1,273 @@
+@page
+@model SimCardShop.Pages.SimCards.IndexModel
+@{
+    ViewData["Title"] = "لیست شماره‌ها";
+    ViewData["Canonical"] = "https://example.ir/simcards";
+
+    string QueryExcept(params string[] except)
+    {
+        var parts = new List<string>();
+        void Add(string key, string? val)
+        {
+            if (except.Contains(key) || string.IsNullOrWhiteSpace(val)) return;
+            parts.Add($"{key}={Uri.EscapeDataString(val)}");
+        }
+        Add("q", Model.Q);
+        Add("operator", Model.Operator);
+        Add("kind", Model.Kind);
+        Add("randomness", Model.Randomness);
+        Add("minPrice", Model.MinPrice?.ToString());
+        Add("maxPrice", Model.MaxPrice?.ToString());
+        Add("availability", Model.Availability);
+        Add("sort", Model.Sort);
+        return string.Join("&", parts);
+    }
+}
+
+<section class="section py-8 md:py-10">
+
+    <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6">
+        <div>
+            <h1 class="text-2xl font-extrabold text-ink mb-1.5">شماره‌های موجود</h1>
+            <p class="text-secondary text-sm">@Model.TotalCount شماره متناسب با جستجوی شما یافت شد</p>
+        </div>
+
+        <form method="get" class="field-with-icon w-full md:w-80">
+            <input type="hidden" name="operator" value="@Model.Operator" />
+            <input type="hidden" name="kind" value="@Model.Kind" />
+            <input type="hidden" name="randomness" value="@Model.Randomness" />
+            <input type="hidden" name="minPrice" value="@Model.MinPrice" />
+            <input type="hidden" name="maxPrice" value="@Model.MaxPrice" />
+            <input type="hidden" name="availability" value="@Model.Availability" />
+            <input type="hidden" name="sort" value="@Model.Sort" />
+            <input type="text" name="q" value="@Model.Q" data-numeric-search inputmode="numeric" maxlength="11"
+                   placeholder="جستجوی سریع شماره..." aria-label="جستجوی شماره"
+                   class="field-input" dir="ltr" style="text-align:right" />
+            <svg data-lucide="search" class="w-4.5 h-4.5"></svg>
+        </form>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-[280px_1fr] gap-6">
+
+        <!-- ============ Sidebar Filters (Desktop) ============ -->
+        <aside class="hidden md:block">
+            <form method="get" class="panel p-5 sticky top-24 space-y-5">
+                <div class="flex items-center justify-between">
+                    <h2 class="font-bold text-ink flex items-center gap-2">
+                        <svg data-lucide="sliders-horizontal" class="w-4 h-4 text-primary"></svg>
+                        فیلترها
+                    </h2>
+                    <a href="/simcards" class="text-xs font-medium text-secondary hover:text-danger">حذف همه</a>
+                </div>
+                <input type="hidden" name="q" value="@Model.Q" />
+
+                <div>
+                    <label class="field-label">اپراتور</label>
+                    <select name="operator" class="field-select">
+                        <option value="">همه اپراتورها</option>
+                        <option value="hamrahaval" selected="@(Model.Operator == "hamrahaval")">همراه اول</option>
+                        <option value="irancell" selected="@(Model.Operator == "irancell")">ایرانسل</option>
+                        <option value="rightel" selected="@(Model.Operator == "rightel")">رایتل</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="field-label">نوع خط</label>
+                    <select name="kind" class="field-select">
+                        <option value="">دائمی / اعتباری</option>
+                        <option value="permanent" selected="@(Model.Kind == "permanent")">دائمی</option>
+                        <option value="credit" selected="@(Model.Kind == "credit")">اعتباری</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="field-label">نوع رندی</label>
+                    <select name="randomness" class="field-select">
+                        <option value="">همه انواع</option>
+                        <option value="rare" selected="@(Model.Randomness == "rare")">رند (ساده و ترتیبی)</option>
+                        <option value="similar" selected="@(Model.Randomness == "similar")">مشابه (جفتی و آینه‌ای)</option>
+                        <option value="special" selected="@(Model.Randomness == "special")">ویژه</option>
+                        <option value="economic" selected="@(Model.Randomness == "economic")">اقتصادی</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="field-label">وضعیت</label>
+                    <select name="availability" class="field-select">
+                        <option value="">موجود / فروخته‌شده</option>
+                        <option value="available" selected="@(Model.Availability == "available")">فقط موجود</option>
+                        <option value="sold" selected="@(Model.Availability == "sold")">فروخته شده</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="field-label">محدوده قیمت (تومان)</label>
+                    <div class="flex items-center gap-2">
+                        <input type="number" name="minPrice" value="@Model.MinPrice" placeholder="حداقل"
+                               class="field-input !px-3 text-sm" />
+                        <span class="text-subtle">—</span>
+                        <input type="number" name="maxPrice" value="@Model.MaxPrice" placeholder="حداکثر"
+                               class="field-input !px-3 text-sm" />
+                    </div>
+                </div>
+
+                <div>
+                    <label class="field-label">مرتب‌سازی</label>
+                    <select name="sort" class="field-select">
+                        <option value="newest" selected="@(Model.Sort == "newest")">جدیدترین</option>
+                        <option value="cheapest" selected="@(Model.Sort == "cheapest")">ارزان‌ترین</option>
+                        <option value="expensive" selected="@(Model.Sort == "expensive")">گران‌ترین</option>
+                    </select>
+                </div>
+
+                <button type="submit" class="btn-accent w-full">
+                    <svg data-lucide="filter" class="w-4 h-4"></svg>
+                    اعمال فیلتر
+                </button>
+            </form>
+        </aside>
+
+        <!-- ============ Results ============ -->
+        <div>
+            <!-- نوار ابزار موبایل: باز کردن فیلتر -->
+            <div class="md:hidden flex items-center gap-2 mb-4">
+                <button type="button" id="mobile-filter-button" class="btn-outline flex-1 !py-2.5 text-sm">
+                    <svg data-lucide="sliders-horizontal" class="w-4 h-4"></svg>
+                    فیلترها
+                </button>
+                <form method="get" class="flex-1">
+                    <input type="hidden" name="q" value="@Model.Q" />
+                    <input type="hidden" name="operator" value="@Model.Operator" />
+                    <input type="hidden" name="kind" value="@Model.Kind" />
+                    <input type="hidden" name="randomness" value="@Model.Randomness" />
+                    <input type="hidden" name="minPrice" value="@Model.MinPrice" />
+                    <input type="hidden" name="maxPrice" value="@Model.MaxPrice" />
+                    <input type="hidden" name="availability" value="@Model.Availability" />
+                    <select name="sort" onchange="this.form.submit()" class="field-select !py-2.5 text-sm w-full">
+                        <option value="newest" selected="@(Model.Sort == "newest")">جدیدترین</option>
+                        <option value="cheapest" selected="@(Model.Sort == "cheapest")">ارزان‌ترین</option>
+                        <option value="expensive" selected="@(Model.Sort == "expensive")">گران‌ترین</option>
+                    </select>
+                </form>
+            </div>
+
+            @if (Model.Results.Any())
+            {
+                <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4">
+                    @foreach (var sim in Model.Results)
+                    {
+                        <partial name="_SimCardCard" model="sim" />
+                    }
+                </div>
+
+                @if (Model.TotalPages > 1)
+                {
+                    <nav class="flex items-center justify-center gap-1.5 mt-10" aria-label="صفحه‌بندی">
+                        @if (Model.Page > 1)
+                        {
+                            <a href="?@QueryExcept("page")&page=@(Model.Page - 1)" class="btn-icon" aria-label="صفحه قبل">
+                                <svg data-lucide="chevron-right" class="w-4 h-4"></svg>
+                            </a>
+                        }
+                        @for (int p = 1; p <= Model.TotalPages; p++)
+                        {
+                            var isCurrent = p == Model.Page;
+                            <a href="?@QueryExcept("page")&page=@p"
+                               class="w-10 h-10 flex items-center justify-center rounded-xl text-sm font-semibold transition-colors @(isCurrent ? "bg-primary text-white" : "text-secondary hover:bg-slate-100")"
+                               aria-current="@(isCurrent ? "page" : null)">
+                                @p
+                            </a>
+                        }
+                        @if (Model.Page < Model.TotalPages)
+                        {
+                            <a href="?@QueryExcept("page")&page=@(Model.Page + 1)" class="btn-icon" aria-label="صفحه بعد">
+                                <svg data-lucide="chevron-left" class="w-4 h-4"></svg>
+                            </a>
+                        }
+                    </nav>
+                }
+            }
+            else
+            {
+                <div class="empty-state">
+                    <svg data-lucide="search-x" class="w-10 h-10 text-subtle"></svg>
+                    <div class="font-bold text-ink">شماره‌ای با این مشخصات پیدا نشد</div>
+                    <p class="text-sm text-secondary">فیلترها را تغییر دهید یا آن‌ها را پاک کنید.</p>
+                    <a href="/simcards" class="btn-outline mt-2">حذف فیلترها</a>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ============ Mobile Filter Drawer / Bottom Sheet ============ -->
+<div id="mobile-filter-backdrop" class="hidden fixed inset-0 bg-ink/40 z-50 md:hidden"></div>
+<div id="mobile-filter-drawer"
+     class="fixed inset-x-0 bottom-0 z-50 md:hidden bg-card rounded-t-3xl shadow-lift translate-y-full transition-transform duration-300 max-h-[85vh] overflow-y-auto">
+    <form method="get" class="p-5 space-y-5">
+        <div class="flex items-center justify-between mb-1">
+            <h2 class="font-bold text-ink">فیلترها</h2>
+            <button type="button" id="mobile-filter-close" class="btn-icon" aria-label="بستن">
+                <svg data-lucide="x" class="w-4 h-4"></svg>
+            </button>
+        </div>
+        <input type="hidden" name="q" value="@Model.Q" />
+
+        <div>
+            <label class="field-label">اپراتور</label>
+            <select name="operator" class="field-select">
+                <option value="">همه اپراتورها</option>
+                <option value="hamrahaval" selected="@(Model.Operator == "hamrahaval")">همراه اول</option>
+                <option value="irancell" selected="@(Model.Operator == "irancell")">ایرانسل</option>
+                <option value="rightel" selected="@(Model.Operator == "rightel")">رایتل</option>
+            </select>
+        </div>
+        <div>
+            <label class="field-label">نوع خط</label>
+            <select name="kind" class="field-select">
+                <option value="">دائمی / اعتباری</option>
+                <option value="permanent" selected="@(Model.Kind == "permanent")">دائمی</option>
+                <option value="credit" selected="@(Model.Kind == "credit")">اعتباری</option>
+            </select>
+        </div>
+        <div>
+            <label class="field-label">نوع رندی</label>
+            <select name="randomness" class="field-select">
+                <option value="">همه انواع</option>
+                <option value="rare" selected="@(Model.Randomness == "rare")">رند (ساده و ترتیبی)</option>
+                <option value="similar" selected="@(Model.Randomness == "similar")">مشابه (جفتی و آینه‌ای)</option>
+                <option value="special" selected="@(Model.Randomness == "special")">ویژه</option>
+                <option value="economic" selected="@(Model.Randomness == "economic")">اقتصادی</option>
+            </select>
+        </div>
+        <div>
+            <label class="field-label">وضعیت</label>
+            <select name="availability" class="field-select">
+                <option value="">موجود / فروخته‌شده</option>
+                <option value="available" selected="@(Model.Availability == "available")">فقط موجود</option>
+                <option value="sold" selected="@(Model.Availability == "sold")">فروخته شده</option>
+            </select>
+        </div>
+        <div>
+            <label class="field-label">محدوده قیمت (تومان)</label>
+            <div class="flex items-center gap-2">
+                <input type="number" name="minPrice" value="@Model.MinPrice" placeholder="حداقل" class="field-input !px-3 text-sm" />
+                <span class="text-subtle">—</span>
+                <input type="number" name="maxPrice" value="@Model.MaxPrice" placeholder="حداکثر" class="field-input !px-3 text-sm" />
+            </div>
+        </div>
+        <div>
+            <label class="field-label">مرتب‌سازی</label>
+            <select name="sort" class="field-select">
+                <option value="newest" selected="@(Model.Sort == "newest")">جدیدترین</option>
+                <option value="cheapest" selected="@(Model.Sort == "cheapest")">ارزان‌ترین</option>
+                <option value="expensive" selected="@(Model.Sort == "expensive")">گران‌ترین</option>
+            </select>
+        </div>
+
+        <div class="flex gap-2 pt-1 pb-2">
+            <a href="/simcards" class="btn-outline flex-1">حذف فیلترها</a>
+            <button type="submit" class="btn-accent flex-1">اعمال فیلتر</button>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,76 @@
+@page "/Admin/Users"
+@model SimCardShop.Pages.Admin.Users.IndexModel
+@{
+    ViewData["Title"] = "کاربران و فروش";
+}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-xl font-extrabold text-ink">کاربران پنل و فروش هر کاربر</h1>
+    <a href="/Admin/Users/Create" class="btn-accent !py-2 !px-5 text-sm">افزودن کاربر جدید</a>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="rounded-xl bg-emerald-50 text-emerald-800 text-sm p-3 mb-5">@Model.StatusMessage</div>
+}
+
+<div class="table-wrap">
+    <table class="table-modern w-full text-sm">
+        <thead>
+            <tr class="text-muted text-right border-b border-slate-100">
+                <th class="py-3 px-4 font-medium">کاربر</th>
+                <th class="py-3 px-4 font-medium">نقش</th>
+                <th class="py-3 px-4 font-medium">تعداد فروش تکمیل‌شده</th>
+                <th class="py-3 px-4 font-medium">مجموع فروش</th>
+                <th class="py-3 px-4 font-medium">وضعیت حساب</th>
+                <th class="py-3 px-4 font-medium">عملیات</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in Model.Rows)
+            {
+                <tr class="border-b border-slate-50">
+                    <td class="py-3 px-4">
+                        <div class="font-medium">@(row.DisplayName ?? row.Email)</div>
+                        <div class="text-xs text-muted" dir="ltr">@row.Email</div>
+                    </td>
+                    <td class="py-3 px-4">
+                        @foreach (var role in row.Roles)
+                        {
+                            <span class="chip">@(role == "Admin" ? "مدیر" : "کارشناس فروش")</span>
+                        }
+                    </td>
+                    <td class="py-3 px-4">@row.CompletedSalesCount</td>
+                    <td class="py-3 px-4 font-medium">@row.TotalSalesAmount.ToString("N0") تومان</td>
+                    <td class="py-3 px-4">
+                        @if (row.IsLockedOut)
+                        {
+                            <span class="text-xs rounded-full px-3 py-1 bg-slate-100 text-slate-500">غیرفعال</span>
+                        }
+                        else
+                        {
+                            <span class="text-xs rounded-full px-3 py-1 bg-emerald-50 text-emerald-700">فعال</span>
+                        }
+                    </td>
+                    <td class="py-3 px-4">
+                        <div class="flex items-center gap-3">
+                            <form method="post" asp-page-handler="ToggleLock" asp-route-id="@row.Id" class="inline">
+                                <button type="submit" class="text-primary font-semibold">
+                                    @(row.IsLockedOut ? "فعال‌سازی" : "غیرفعال کردن")
+                                </button>
+                            </form>
+                            <form method="post" asp-page-handler="Delete" asp-route-id="@row.Id"
+                                  onsubmit="return confirm('آیا از حذف این کاربر مطمئن هستید؟');" class="inline">
+                                <button type="submit" class="text-danger">حذف</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<p class="text-xs text-muted mt-4 leading-6">
+    مجموع فروش بر اساس سفارش‌هایی محاسبه می‌شود که وضعیت آن‌ها به «تکمیل شده» تغییر کرده و توسط همان کاربر در صفحه جزئیات سفارش ثبت شده باشد.
+</p>

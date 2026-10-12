@@ -1,0 +1,55 @@
+@page "/Admin/Sms/History"
+@model SimCardShop.Pages.Admin.Sms.HistoryModel
+@{
+    ViewData["Title"] = "تاریخچه پیامک‌ها";
+}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-xl font-extrabold text-ink">تاریخچه پیامک‌ها</h1>
+    <a href="/Admin/Sms/Send" class="btn-accent !py-2 !px-5 text-sm">ارسال کمپین جدید</a>
+</div>
+
+<div class="grid gap-4">
+    @foreach (var c in Model.Campaigns)
+    {
+        <div class="card-base p-5">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                <div>
+                    <span class="font-bold text-ink">@c.Title</span>
+                    @if (c.SimCard is not null)
+                    {
+                        <span class="chip mr-2" dir="ltr">@c.SimCard.DisplayNumber</span>
+                    }
+                </div>
+                <span class="text-xs text-muted">@c.CreatedAt.ToString("yyyy/MM/dd HH:mm")</span>
+            </div>
+
+            <pre class="text-sm text-muted whitespace-pre-wrap font-sans bg-surface rounded-xl p-4 mb-3">@c.MessageText</pre>
+
+            <div class="flex flex-wrap gap-4 text-sm">
+                <span>گیرندگان: <strong>@c.TotalRecipients</strong></span>
+                <span class="text-emerald-700">موفق: <strong>@c.SentCount</strong></span>
+                <span class="text-danger">ناموفق: <strong>@c.FailedCount</strong></span>
+                <span>وضعیت: <strong>@DisplayLabels.SmsCampaignStatus(c.Status)</strong></span>
+            </div>
+        </div>
+    }
+
+    @if (!Model.Campaigns.Any())
+    {
+        <div class="card-base p-10 text-center text-muted">هنوز پیامکی ارسال نشده است.</div>
+    }
+</div>
+
+@if (Model.TotalPages > 1)
+{
+    <div class="flex items-center justify-center gap-2 mt-6">
+        @for (int p = 1; p <= Model.TotalPages; p++)
+        {
+            var isCurrent = p == Model.Page;
+            <a href="?page=@p" class="w-9 h-9 flex items-center justify-center rounded-full text-sm @(isCurrent ? "bg-primary text-white" : "text-secondary hover:bg-slate-100")">
+                @p
+            </a>
+        }
+    </div>
+}

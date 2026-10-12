@@ -1,0 +1,335 @@
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "خرید شماره رند و مشابه";
+    ViewData["Canonical"] = "https://example.ir/";
+}
+
+<!-- ============ Hero ============ -->
+<section class="relative overflow-hidden bg-hero-radial bg-surface border-b border-line">
+    <div class="section py-14 md:py-20">
+        <div class="text-center max-w-3xl mx-auto mb-10 animate-fade-up">
+            <span class="eyebrow mb-5">
+                <svg data-lucide="sparkles" class="w-3.5 h-3.5"></svg>
+                معتبرترین مرجع خرید شماره رند و مشابه
+            </span>
+            <h1 class="h1-hero mb-5">
+                شماره‌ای که به شما میاد، <span class="text-primary">همین‌جاست</span>
+            </h1>
+            <p class="text-secondary text-base md:text-lg leading-8 max-w-xl mx-auto">
+                جستجو و خرید آسان شماره‌های معمولی، رند، مشابه و ویژه از اپراتورهای مختلف
+            </p>
+        </div>
+
+        <!-- Search Box -->
+        <form method="get" asp-page="/SimCards/Index" class="panel p-3 md:p-4 max-w-4xl mx-auto animate-fade-up" style="animation-delay:.1s">
+            <div class="flex flex-col md:flex-row gap-3">
+                <div class="field-with-icon flex-1">
+                    <input type="text" name="q" data-numeric-search inputmode="numeric" maxlength="11"
+                           placeholder="مثلاً 0912 یا 1234"
+                           aria-label="جستجوی شماره"
+                           class="field-input !py-3.5 !pr-11 text-lg" dir="ltr" style="text-align:right" />
+                    <svg data-lucide="search" class="w-5 h-5"></svg>
+                </div>
+                <button type="submit" class="btn-accent !py-3.5 md:!px-8 text-base shrink-0">
+                    <svg data-lucide="search" class="w-4 h-4"></svg>
+                    جستجوی شماره
+                </button>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-2.5 mt-3 pt-3 border-t border-line">
+                <select name="operator" class="field-select !py-2.5 text-sm">
+                    <option value="">همه اپراتورها</option>
+                    <option value="hamrahaval">همراه اول</option>
+                    <option value="irancell">ایرانسل</option>
+                    <option value="rightel">رایتل</option>
+                </select>
+                <select name="randomness" class="field-select !py-2.5 text-sm">
+                    <option value="">نوع شماره</option>
+                    <option value="rare">رند</option>
+                    <option value="similar">مشابه</option>
+                    <option value="special">ویژه</option>
+                    <option value="economic">اقتصادی</option>
+                </select>
+                <select name="maxPrice" class="field-select !py-2.5 text-sm">
+                    <option value="">همه قیمت‌ها</option>
+                    <option value="5000000">تا ۵ میلیون تومان</option>
+                    <option value="20000000">تا ۲۰ میلیون تومان</option>
+                    <option value="50000000">تا ۵۰ میلیون تومان</option>
+                </select>
+                <select name="availability" class="field-select !py-2.5 text-sm">
+                    <option value="available">فقط موجود</option>
+                    <option value="">همه وضعیت‌ها</option>
+                </select>
+            </div>
+        </form>
+
+        <div class="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 mt-8 text-sm text-secondary animate-fade-up" style="animation-delay:.15s">
+            <span class="flex items-center gap-1.5"><svg data-lucide="badge-check" class="w-4 h-4 text-success"></svg>ضمانت اصالت شماره</span>
+            <span class="flex items-center gap-1.5"><svg data-lucide="zap" class="w-4 h-4 text-primary"></svg>جستجوی آنی</span>
+            <span class="flex items-center gap-1.5"><svg data-lucide="lock" class="w-4 h-4 text-purple"></svg>پرداخت امن</span>
+        </div>
+    </div>
+</section>
+
+<!-- ============ اپراتورها ============ -->
+<section class="section py-14 md:py-16">
+    <div class="flex items-end justify-between mb-7">
+        <div>
+            <h2 class="h2-section mb-1.5">اپراتورها</h2>
+            <p class="text-secondary text-sm">شماره مورد نظرتان را از هر اپراتور پیدا کنید</p>
+        </div>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <a href="/simcards?operator=hamrahaval" class="card-base hoverable group p-6 flex items-center gap-4">
+            <span class="w-14 h-14 rounded-2xl bg-primary-50 text-primary flex items-center justify-center shrink-0">
+                <svg data-lucide="signal" class="w-7 h-7"></svg>
+            </span>
+            <div class="flex-1 min-w-0">
+                <div class="font-bold text-ink mb-0.5">همراه اول</div>
+                <div class="text-sm text-secondary">@Model.HamrahAvalCount شماره موجود</div>
+            </div>
+            <svg data-lucide="chevron-left" class="w-5 h-5 text-subtle group-hover:text-primary transition-colors"></svg>
+        </a>
+        <a href="/simcards?operator=irancell" class="card-base hoverable group p-6 flex items-center gap-4">
+            <span class="w-14 h-14 rounded-2xl bg-cyan-50 text-cyan flex items-center justify-center shrink-0">
+                <svg data-lucide="signal" class="w-7 h-7"></svg>
+            </span>
+            <div class="flex-1 min-w-0">
+                <div class="font-bold text-ink mb-0.5">ایرانسل</div>
+                <div class="text-sm text-secondary">@Model.IrancellCount شماره موجود</div>
+            </div>
+            <svg data-lucide="chevron-left" class="w-5 h-5 text-subtle group-hover:text-primary transition-colors"></svg>
+        </a>
+        <a href="/simcards?operator=rightel" class="card-base hoverable group p-6 flex items-center gap-4">
+            <span class="w-14 h-14 rounded-2xl bg-purple-50 text-purple flex items-center justify-center shrink-0">
+                <svg data-lucide="signal" class="w-7 h-7"></svg>
+            </span>
+            <div class="flex-1 min-w-0">
+                <div class="font-bold text-ink mb-0.5">رایتل</div>
+                <div class="text-sm text-secondary">@Model.RightelCount شماره موجود</div>
+            </div>
+            <svg data-lucide="chevron-left" class="w-5 h-5 text-subtle group-hover:text-primary transition-colors"></svg>
+        </a>
+    </div>
+</section>
+
+<!-- ============ دسته‌بندی شماره‌ها ============ -->
+<section class="section py-8 md:py-10">
+    <div class="flex items-end justify-between mb-7">
+        <div>
+            <h2 class="h2-section mb-1.5">دسته‌بندی شماره‌ها</h2>
+            <p class="text-secondary text-sm">بر اساس نوع شماره‌ای که دنبالش هستید، جستجو را شروع کنید</p>
+        </div>
+        <a href="/simcards" class="hidden sm:flex items-center gap-1 text-sm font-semibold text-primary hover:text-primary-dark">
+            مشاهده همه
+            <svg data-lucide="arrow-left" class="w-4 h-4"></svg>
+        </a>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <a href="/simcards?randomness=rare" class="card-base hoverable p-5">
+            <span class="w-11 h-11 rounded-xl bg-primary-50 text-primary flex items-center justify-center mb-3">
+                <svg data-lucide="gem" class="w-5 h-5"></svg>
+            </span>
+            <div class="font-bold text-ink mb-1">شماره‌های رند</div>
+            <div class="text-xs text-secondary mb-2">شامل رند ساده و ترتیبی</div>
+            <div class="text-sm font-semibold text-primary">@Model.RandomCount شماره</div>
+        </a>
+        <a href="/simcards?randomness=similar" class="card-base hoverable p-5">
+            <span class="w-11 h-11 rounded-xl bg-cyan-50 text-cyan flex items-center justify-center mb-3">
+                <svg data-lucide="copy" class="w-5 h-5"></svg>
+            </span>
+            <div class="font-bold text-ink mb-1">شماره‌های مشابه</div>
+            <div class="text-xs text-secondary mb-2">شامل جفتی و آینه‌ای</div>
+            <div class="text-sm font-semibold text-primary">@Model.SimilarCount شماره</div>
+        </a>
+        <a href="/simcards?randomness=special" class="card-base hoverable p-5">
+            <span class="w-11 h-11 rounded-xl bg-purple-50 text-purple flex items-center justify-center mb-3">
+                <svg data-lucide="star" class="w-5 h-5"></svg>
+            </span>
+            <div class="font-bold text-ink mb-1">شماره‌های ویژه</div>
+            <div class="text-xs text-secondary mb-2">منتخب و کمیاب</div>
+            <div class="text-sm font-semibold text-primary">@Model.SpecialCount شماره</div>
+        </a>
+        <a href="/simcards?randomness=economic" class="card-base hoverable p-5">
+            <span class="w-11 h-11 rounded-xl bg-success/10 text-success flex items-center justify-center mb-3">
+                <svg data-lucide="wallet" class="w-5 h-5"></svg>
+            </span>
+            <div class="font-bold text-ink mb-1">شماره‌های اقتصادی</div>
+            <div class="text-xs text-secondary mb-2">مقرون‌به‌صرفه</div>
+            <div class="text-sm font-semibold text-primary">@Model.EconomicCount شماره</div>
+        </a>
+    </div>
+</section>
+
+<!-- ============ شماره‌های ویژه ============ -->
+@if (Model.FeaturedSimCards.Any())
+{
+    <section class="section py-8 md:py-10">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="h2-section">شماره‌های ویژه</h2>
+            <a href="/simcards" class="flex items-center gap-1 text-sm font-semibold text-primary hover:text-primary-dark">
+                مشاهده همه <svg data-lucide="arrow-left" class="w-4 h-4"></svg>
+            </a>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+            @foreach (var sim in Model.FeaturedSimCards)
+            {
+                <partial name="_SimCardCard" model="sim" />
+            }
+        </div>
+    </section>
+}
+
+<!-- ============ جدیدترین شماره‌ها ============ -->
+<section class="section py-8 md:py-10">
+    <div class="flex items-center justify-between mb-6">
+        <h2 class="h2-section">جدیدترین شماره‌ها</h2>
+        <a href="/simcards?sort=newest" class="flex items-center gap-1 text-sm font-semibold text-primary hover:text-primary-dark">
+            مشاهده همه <svg data-lucide="arrow-left" class="w-4 h-4"></svg>
+        </a>
+    </div>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        @foreach (var sim in Model.LatestSimCards)
+        {
+            <partial name="_SimCardCard" model="sim" />
+        }
+    </div>
+</section>
+
+<!-- ============ چرا ما؟ ============ -->
+<section class="bg-white border-y border-line">
+    <div class="section py-14 md:py-16">
+        <div class="text-center max-w-xl mx-auto mb-10">
+            <h2 class="h2-section mb-2">چرا @("شماره‌یاب")؟</h2>
+            <p class="text-secondary text-sm">هر آن‌چه برای یک خرید مطمئن و بی‌دردسر لازم دارید</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5">
+            <div class="flex gap-4">
+                <span class="w-11 h-11 rounded-xl bg-primary-50 text-primary flex items-center justify-center shrink-0">
+                    <svg data-lucide="layers" class="w-5 h-5"></svg>
+                </span>
+                <div>
+                    <div class="font-bold text-ink mb-1">تنوع بالای شماره‌ها</div>
+                    <p class="text-sm text-secondary leading-6">هزاران شماره از تمام اپراتورها و دسته‌بندی‌ها.</p>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <span class="w-11 h-11 rounded-xl bg-cyan-50 text-cyan flex items-center justify-center shrink-0">
+                    <svg data-lucide="zap" class="w-5 h-5"></svg>
+                </span>
+                <div>
+                    <div class="font-bold text-ink mb-1">جستجوی سریع</div>
+                    <p class="text-sm text-secondary leading-6">فیلترهای دقیق برای رسیدن سریع به شماره دلخواه.</p>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <span class="w-11 h-11 rounded-xl bg-purple-50 text-purple flex items-center justify-center shrink-0">
+                    <svg data-lucide="mouse-pointer-click" class="w-5 h-5"></svg>
+                </span>
+                <div>
+                    <div class="font-bold text-ink mb-1">خرید آسان</div>
+                    <p class="text-sm text-secondary leading-6">ثبت سفارش در چند ثانیه، بدون پیچیدگی.</p>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <span class="w-11 h-11 rounded-xl bg-success/10 text-success flex items-center justify-center shrink-0">
+                    <svg data-lucide="headset" class="w-5 h-5"></svg>
+                </span>
+                <div>
+                    <div class="font-bold text-ink mb-1">پشتیبانی</div>
+                    <p class="text-sm text-secondary leading-6">کارشناسان دفتر همراه شما تا دریافت شماره.</p>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <span class="w-11 h-11 rounded-xl bg-warning/10 text-warning flex items-center justify-center shrink-0">
+                    <svg data-lucide="tag" class="w-5 h-5"></svg>
+                </span>
+                <div>
+                    <div class="font-bold text-ink mb-1">نمایش شفاف قیمت</div>
+                    <p class="text-sm text-secondary leading-6">بدون هزینه پنهان؛ قیمت نهایی همان چیزی‌ست که می‌بینید.</p>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <span class="w-11 h-11 rounded-xl bg-danger/10 text-danger flex items-center justify-center shrink-0">
+                    <svg data-lucide="shield-check" class="w-5 h-5"></svg>
+                </span>
+                <div>
+                    <div class="font-bold text-ink mb-1">امنیت سفارش</div>
+                    <p class="text-sm text-secondary leading-6">ثبت و پیگیری سفارش با کد اختصاصی و قابل استعلام.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============ مراحل خرید ============ -->
+<section class="section py-14 md:py-16">
+    <div class="text-center max-w-xl mx-auto mb-10">
+        <h2 class="h2-section mb-2">مراحل خرید</h2>
+        <p class="text-secondary text-sm">از جستجو تا دریافت شماره، تنها ۵ گام ساده</p>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+        @{
+            var steps = new (string icon, string title)[]
+            {
+                ("search", "جستجوی شماره"),
+                ("mouse-pointer-click", "انتخاب شماره"),
+                ("clipboard-list", "ثبت سفارش"),
+                ("credit-card", "پرداخت"),
+                ("package-check", "دریافت شماره"),
+            };
+        }
+        @for (int i = 0; i < steps.Length; i++)
+        {
+            <div class="relative card-base p-5 text-center">
+                <span class="absolute -top-3 -right-3 w-7 h-7 rounded-full bg-ink text-white text-xs font-bold flex items-center justify-center">@(i + 1)</span>
+                <span class="w-12 h-12 mx-auto rounded-2xl bg-primary-50 text-primary flex items-center justify-center mb-3">
+                    <svg data-lucide="@steps[i].icon" class="w-6 h-6"></svg>
+                </span>
+                <div class="font-bold text-sm text-ink">@steps[i].title</div>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- ============ FAQ ============ -->
+<section class="bg-white border-y border-line">
+    <div class="section py-14 md:py-16 max-w-3xl">
+        <div class="text-center mb-10">
+            <h2 class="h2-section mb-2">سوالات متداول</h2>
+            <p class="text-secondary text-sm">پاسخ پرتکرارترین سوالات مشتریان</p>
+        </div>
+        <div class="space-y-3">
+            @for (int i = 0; i < Model.Faqs.Count; i++)
+            {
+                var faq = Model.Faqs[i];
+                <div class="card-base overflow-hidden">
+                    <button type="button" data-faq-trigger aria-expanded="false" aria-controls="faq-panel-@i"
+                            class="w-full flex items-center justify-between gap-3 p-5 text-right font-semibold text-ink">
+                        <span>@faq.Question</span>
+                        <svg data-faq-icon data-lucide="plus" class="w-4 h-4 shrink-0 text-primary transition-transform duration-200"></svg>
+                    </button>
+                    <div id="faq-panel-@i" class="hidden px-5 pb-5 -mt-1 text-sm text-secondary leading-7">
+                        @faq.Answer
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- ============ CTA پایانی ============ -->
+<section class="section py-16 md:py-20">
+    <div class="rounded-card bg-primary-soft bg-primary relative overflow-hidden text-center px-6 py-14 md:py-16">
+        <div class="absolute inset-0 bg-hero-radial opacity-40"></div>
+        <div class="relative">
+            <h2 class="text-2xl md:text-3xl font-extrabold text-white mb-3">آماده‌اید شماره دلخواهتان را پیدا کنید؟</h2>
+            <p class="text-white/80 mb-8 max-w-lg mx-auto">همین حالا جستجو را شروع کنید و شماره متناسب با سلیقه‌تان را انتخاب کنید.</p>
+            <a href="/simcards" class="inline-flex items-center gap-2 bg-white text-primary font-bold rounded-xl px-7 py-3.5 hover:bg-white/90 transition-colors shadow-lift">
+                <svg data-lucide="search" class="w-4 h-4"></svg>
+                مشاهده همه شماره‌ها
+            </a>
+        </div>
+    </div>
+</section>

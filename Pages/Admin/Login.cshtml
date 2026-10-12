@@ -1,0 +1,45 @@
+@page "/Admin/Login"
+@model SimCardShop.Pages.Admin.LoginModel
+@{
+    ViewData["Title"] = "ورود مدیر";
+    Layout = "/Pages/Shared/_Layout.cshtml";
+}
+
+<section class="section py-16 md:py-24 max-w-sm">
+    <div class="panel p-8">
+        <div class="text-center mb-6">
+            <span class="w-12 h-12 mx-auto rounded-2xl bg-primary text-white flex items-center justify-center font-extrabold text-lg mb-3">ش</span>
+            <h1 class="text-xl font-extrabold text-ink">ورود به پنل مدیریت</h1>
+            <p class="text-sm text-secondary mt-1">برای دسترسی به پنل مدیریت وارد شوید</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="rounded-xl bg-danger/10 text-danger text-sm p-3 mb-4 flex items-center gap-2">
+                <svg data-lucide="triangle-alert" class="w-4 h-4 shrink-0"></svg>
+                @Model.ErrorMessage
+            </div>
+        }
+
+        <form method="post" class="space-y-4">
+            <div>
+                <label asp-for="Input.Email" class="field-label"></label>
+                <input asp-for="Input.Email" dir="ltr" class="field-input text-right" />
+                <span asp-validation-for="Input.Email" class="field-error"></span>
+            </div>
+            <div>
+                <label asp-for="Input.Password" class="field-label"></label>
+                <input asp-for="Input.Password" class="field-input" />
+                <span asp-validation-for="Input.Password" class="field-error"></span>
+            </div>
+            <div class="flex items-center gap-2">
+                <input asp-for="Input.RememberMe" class="w-4 h-4 rounded border-line accent-primary focus:ring-2 focus:ring-primary/20" />
+                <label asp-for="Input.RememberMe" class="text-sm text-secondary"></label>
+            </div>
+            <button type="submit" class="btn-accent w-full !py-3">
+                <svg data-lucide="log-in" class="w-4 h-4"></svg>
+                ورود
+            </button>
+        </form>
+    </div>
+</section>

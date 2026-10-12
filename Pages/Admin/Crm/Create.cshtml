@@ -1,0 +1,54 @@
+@page "/Admin/Crm/Create"
+@model SimCardShop.Pages.Admin.Crm.CreateModel
+@{
+    ViewData["Title"] = "افزودن مشتری";
+}
+
+<div class="flex items-center gap-3 mb-6">
+    <a href="/Admin/Crm" class="text-muted text-sm">مشتریان</a>
+    <span class="text-muted">/</span>
+    <h1 class="text-xl font-extrabold text-ink">افزودن مشتری جدید</h1>
+</div>
+
+<form method="post" class="card-base p-6 md:p-8 max-w-lg">
+    <div asp-validation-summary="ModelOnly" class="field-error mb-4"></div>
+
+    <div class="mb-5">
+        <label asp-for="Input.FullName" class="field-label"></label>
+        <input asp-for="Input.FullName" class="field-input" />
+        <span asp-validation-for="Input.FullName" class="field-error"></span>
+    </div>
+
+    <div class="mb-5">
+        <label asp-for="Input.Mobile" class="field-label"></label>
+        <input asp-for="Input.Mobile" dir="ltr" class="field-input text-right" />
+        <span asp-validation-for="Input.Mobile" class="field-error"></span>
+    </div>
+
+    <div class="mb-5">
+        <label asp-for="Input.Email" class="field-label"></label>
+        <input asp-for="Input.Email" dir="ltr" class="field-input text-right" />
+        <span asp-validation-for="Input.Email" class="field-error"></span>
+    </div>
+
+    <div class="mb-5">
+        <label class="field-label">کارشناس مسئول (اختیاری)</label>
+        <select name="Input.AssignedToUserId" class="field-input">
+            <option value="">— بدون مسئول —</option>
+            @foreach (var u in Model.StaffUsers)
+            {
+                <option value="@u.Id">@(u.DisplayName ?? u.Email)</option>
+            }
+        </select>
+    </div>
+
+    <div class="mb-6">
+        <label asp-for="Input.InitialNote" class="field-label"></label>
+        <textarea asp-for="Input.InitialNote" rows="3" class="field-input"></textarea>
+    </div>
+
+    <div class="flex gap-3">
+        <button type="submit" class="btn-accent">ثبت مشتری</button>
+        <a href="/Admin/Crm" class="btn-outline">انصراف</a>
+    </div>
+</form>

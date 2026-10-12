@@ -1,0 +1,151 @@
+@page "/Admin/Crm/Details/{id:int}"
+@model SimCardShop.Pages.Admin.Crm.DetailsModel
+@{
+    ViewData["Title"] = "پروفایل مشتری - " + Model.Customer.FullName;
+}
+
+<div class="flex items-center gap-3 mb-6">
+    <a href="/Admin/Crm" class="text-muted text-sm">مشتریان</a>
+    <span class="text-muted">/</span>
+    <h1 class="text-xl font-extrabold text-ink">@Model.Customer.FullName</h1>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="rounded-xl bg-emerald-50 text-emerald-800 text-sm p-3 mb-5">@Model.StatusMessage</div>
+}
+
+<div class="grid md:grid-cols-3 gap-6">
+
+    <div class="md:col-span-2 space-y-6">
+
+        <div class="card-base p-6">
+            <h2 class="font-bold text-ink mb-4">افزودن یادداشت / رخداد</h2>
+            <form method="post" asp-page-handler="AddNote" asp-route-id="@Model.Customer.Id">
+                <div asp-validation-summary="ModelOnly" class="field-error mb-3"></div>
+                <div class="flex flex-wrap gap-3 mb-3">
+                    <select name="Note.Type" class="field-select text-sm">
+                        <option value="Note">یادداشت</option>
+                        <option value="Call">تماس تلفنی</option>
+                        <option value="Sms">پیامک</option>
+                    </select>
+                </div>
+                <textarea asp-for="Note.Text" rows="3" placeholder="مثلاً: با مشتری تماس گرفتم، هفته بعد جواب می‌دهد."
+                          class="field-textarea mb-3"></textarea>
+                <button type="submit" class="btn-primary">ثبت</button>
+            </form>
+        </div>
+
+        <div class="card-base p-6">
+            <h2 class="font-bold text-ink mb-4">تایم‌لاین فعالیت‌ها</h2>
+            @if (Model.Activities.Any())
+            {
+                <div class="space-y-4">
+                    @foreach (var a in Model.Activities)
+                    {
+                        <div class="border-r-2 border-slate-100 pr-4">
+                            <div class="flex items-center gap-2 mb-1">
+                                <span class="chip">@DisplayLabels.ActivityType(a.Type)</span>
+                                <span class="text-xs text-muted">@a.CreatedAt.ToString("yyyy/MM/dd HH:mm")</span>
+                                @if (a.CreatedByUser is not null)
+                                {
+                                    <span class="text-xs text-muted">— @(a.CreatedByUser.DisplayName ?? a.CreatedByUser.Email)</span>
+                                }
+                            </div>
+                            <p class="text-sm leading-6">@a.Text</p>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted text-sm">هنوز فعالیتی ثبت نشده است.</p>
+            }
+        </div>
+
+        <div class="card-base p-6">
+            <h2 class="font-bold text-ink mb-4">سفارش‌های این مشتری</h2>
+            @if (Model.Orders.Any())
+            {
+                <div class="space-y-2">
+                    @foreach (var o in Model.Orders)
+                    {
+                        <div class="flex items-center justify-between rounded-xl bg-surface px-4 py-3 text-sm">
+                            <div>
+                                <a href="/Admin/Orders/Details/@o.Id" class="font-medium text-navy">@o.OrderCode</a>
+                                <span class="text-muted mr-2" dir="ltr">@(o.Items.FirstOrDefault()?.SimCard?.DisplayNumber ?? "-")</span>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <span class="chip">@DisplayLabels.OrderStatus(o.Status)</span>
+                                <span class="text-muted">@o.CreatedAt.ToString("yyyy/MM/dd")</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <p class="text-muted text-sm">سفارشی برای این مشتری ثبت نشده است.</p>
+            }
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <div class="card-base p-6">
+            <h2 class="font-bold text-ink mb-4">اطلاعات تماس</h2>
+            <dl class="text-sm space-y-2">
+                <div class="flex justify-between">
+                    <dt class="text-muted">موبایل</dt>
+                    <dd dir="ltr">@Model.Customer.Mobile</dd>
+                </div>
+                @if (!string.IsNullOrWhiteSpace(Model.Customer.Email))
+                {
+                    <div class="flex justify-between">
+                        <dt class="text-muted">ایمیل</dt>
+                        <dd dir="ltr">@Model.Customer.Email</dd>
+                    </div>
+                }
+                <div class="flex justify-between">
+                    <dt class="text-muted">تاریخ ثبت</dt>
+                    <dd>@Model.Customer.CreatedAt.ToString("yyyy/MM/dd")</dd>
+                </div>
+            </dl>
+            <div class="flex gap-2 mt-4">
+                <a href="tel:@Model.Customer.Mobile" class="btn-outline !py-2 text-sm flex-1 text-center">تماس</a>
+                <a href="/Admin/Sms/Send?prefillMobile=@Model.Customer.Mobile" class="btn-outline !py-2 text-sm flex-1 text-center">پیامک</a>
+            </div>
+        </div>
+
+        <div class="card-base p-6">
+            <h2 class="font-bold text-ink mb-4">وضعیت و پیگیری</h2>
+            <form method="post" asp-page-handler="UpdateProfile" asp-route-id="@Model.Customer.Id" class="space-y-4">
+                <div>
+                    <label class="field-label">وضعیت</label>
+                    <select name="Profile.Status" class="field-input">
+                        <option value="Lead" selected="@(Model.Profile.Status == CustomerStatus.Lead)">سرنخ جدید</option>
+                        <option value="Contacted" selected="@(Model.Profile.Status == CustomerStatus.Contacted)">در حال پیگیری</option>
+                        <option value="Customer" selected="@(Model.Profile.Status == CustomerStatus.Customer)">مشتری</option>
+                        <option value="Lost" selected="@(Model.Profile.Status == CustomerStatus.Lost)">از دست رفته</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">کارشناس مسئول</label>
+                    <select name="Profile.AssignedToUserId" class="field-input">
+                        <option value="">— بدون مسئول —</option>
+                        @foreach (var u in Model.StaffUsers)
+                        {
+                            <option value="@u.Id" selected="@(Model.Profile.AssignedToUserId == u.Id)">@(u.DisplayName ?? u.Email)</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label class="field-label">تاریخ پیگیری بعدی</label>
+                    <input type="date" name="Profile.NextFollowUpAt"
+                           value="@(Model.Profile.NextFollowUpAt?.ToString("yyyy-MM-dd"))"
+                           class="field-input" />
+                </div>
+                <button type="submit" class="btn-accent w-full">ذخیره تغییرات</button>
+            </form>
+        </div>
+    </div>
+</div>

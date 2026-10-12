@@ -1,0 +1,102 @@
+﻿@page "/tracking"
+@model SimCardShop.Pages.TrackingModel
+@{
+    ViewData["Title"] = "پیگیری سفارش‌ها";
+}
+
+<section class="section max-w-2xl mx-auto py-12 md:py-16">
+    <div class="panel p-6 md:p-8 mb-8">
+        <h1 class="text-2xl font-extrabold text-ink mb-2">پیگیری سفارش خرید سیم‌کارت</h1>
+        <p class="text-secondary text-sm mb-6">کد سفارش (مثل ORD-123456) یا شماره موبایل خود را وارد کنید تا وضعیت سفارش را مشاهده کنید.</p>
+
+        <form method="get" class="flex flex-col sm:flex-row gap-3">
+            <!-- 🔴 مقدار name دقیقاً به SearchQuery تغییر کرد تا با مدل سرور یکی باشد -->
+            <input type="text"
+                   name="SearchQuery"
+                   value="@Model.SearchQuery"
+                   placeholder="کد سفارش یا شماره موبایل (مثلاً 09123456789)"
+                   class="field-input flex-1"
+                   required />
+
+            <button type="submit" class="btn-accent shrink-0">
+                <svg data-lucide="search" class="w-4 h-4"></svg>
+                جستجوی سفارش
+            </button>
+        </form>
+    </div>
+
+    @if (Model.HasSearched)
+    {
+        @if (Model.Orders != null && Model.Orders.Any())
+        {
+            <div class="space-y-4">
+                <h2 class="font-bold text-lg text-ink mb-4">نتیجه جستجو (@Model.Orders.Count سفارش یافت شد)</h2>
+
+                @foreach (var order in Model.Orders)
+                {
+                    var simCard = order.Items.FirstOrDefault()?.SimCard;
+                    var statusText = order.Status switch
+                    {
+                        OrderStatus.New => "جدید / در انتظار بررسی",
+                        OrderStatus.Paid => "پرداخت شده",
+                        OrderStatus.Completed => "تکمیل شده",
+                        OrderStatus.Cancelled => "لغو شده",
+                        _ => "نامشخص"
+                    };
+                    var statusBadge = order.IsPaid ? "badge-success bg-success/10 text-success" : "badge-warning bg-warning/10 text-warning";
+
+                    <div class="panel p-6">
+                        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-line pb-4 mb-4">
+                            <div>
+                                <span class="text-xs text-secondary">کد سفارش:</span>
+                                <span class="font-bold text-ink mr-1">@order.OrderCode</span>
+                            </div>
+                            <div>
+                                <span class="@statusBadge px-2 py-1 rounded text-sm font-semibold">@statusText</span>
+                            </div>
+                        </div>
+
+                        <dl class="space-y-2 text-sm mb-4">
+                            @if (simCard != null)
+                            {
+                                <div class="flex items-center justify-between">
+                                    <dt class="text-secondary">شماره سیم‌کارت</dt>
+                                    <dd class="number-plate text-base">@simCard.DisplayNumber</dd>
+                                </div>
+                            }
+                            <div class="flex items-center justify-between">
+                                <dt class="text-secondary">نام مشتری</dt>
+                                <dd class="font-medium text-ink">@order.CustomerName</dd>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <dt class="text-secondary">مبلغ کل</dt>
+                                <dd class="font-bold text-ink">@order.TotalAmount.ToString("N0") تومان</dd>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <dt class="text-secondary">تاریخ ثبت</dt>
+                                <dd class="text-ink" dir="ltr">@order.CreatedAt.ToLocalTime().ToString("yyyy/MM/dd HH:mm")</dd>
+                            </div>
+                        </dl>
+
+                        @if (!order.IsPaid && order.Status != OrderStatus.Cancelled)
+                        {
+                            <div class="pt-4 border-t border-line flex justify-end">
+                                <form method="post" asp-page-handler="RetryPayment" asp-route-orderId="@order.Id">
+                                    <button type="submit" class="btn-accent text-sm">
+                                        تکمیل پرداخت و اتصال به درگاه
+                                    </button>
+                                </form>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        }
+        else
+        {
+            <div class="panel p-6 text-center text-secondary">
+                <p>هیچ سفارشی با مشخصات وارد شده یافت نشد.</p>
+            </div>
+        }
+    }
+</section>

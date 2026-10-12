@@ -1,0 +1,260 @@
+@page "/i/{number}"
+@model SimCardDetailsModel
+@{
+    var sim = Model.SimCard!;
+    ViewData["Title"] = sim.DisplayNumber;
+    ViewData["Description"] = $"مشاهده و خرید شماره {sim.DisplayNumber} - قیمت {sim.FinalPrice:N0} تومان";
+    ViewData["Canonical"] = $"https://example.ir/i/{sim.Number}";
+
+    var operatorLabel = sim.Operator switch
+    {
+        OperatorType.HamrahAval => "همراه اول",
+        OperatorType.Irancell => "ایرانسل",
+        OperatorType.Rightel => "رایتل",
+        _ => ""
+    };
+    var randomLabel = sim.RandomnessType switch
+    {
+        RandomnessType.Simple => "رند ساده",
+        RandomnessType.Paired => "رند جفتی",
+        RandomnessType.Sequential => "رند ترتیبی",
+        RandomnessType.Mirror => "رند آینه‌ای",
+        RandomnessType.Special => "رند ویژه",
+        RandomnessType.Economic => "اقتصادی",
+        _ => ""
+    };
+    var statusLabel = sim.Status switch
+    {
+        SimCardStatus.Available => "موجود",
+        SimCardStatus.Reserved => "رزرو شده",
+        SimCardStatus.Sold => "فروخته شده",
+        _ => ""
+    };
+    var statusBadgeClass = sim.Status == SimCardStatus.Available ? "badge-success" : "badge-warning";
+    var prefix = sim.Number.Length >= 4 ? sim.Number[..4] : sim.Number;
+}
+
+<section class="section py-8 md:py-12">
+
+    <a href="/simcards" class="inline-flex items-center gap-1.5 text-sm font-medium text-secondary hover:text-ink mb-6">
+        <svg data-lucide="arrow-right" class="w-4 h-4"></svg>
+        بازگشت به فهرست شماره‌ها
+    </a>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-6 items-start">
+
+        <!-- ============ ستون اصلی ============ -->
+        <div>
+            <div class="card-base card-featured p-6 md:p-10 mb-6 text-center relative">
+                <div class="flex items-center justify-center gap-2 mb-6">
+                    <span class="chip-primary"><svg data-lucide="signal" class="w-3 h-3"></svg>@operatorLabel</span>
+                    <span class="@statusBadgeClass">@statusLabel</span>
+                </div>
+
+                <div class="number-plate text-3xl md:text-5xl justify-center mb-6">@sim.DisplayNumber</div>
+
+                <div class="flex flex-wrap items-center justify-center gap-2">
+                    <span class="chip">@randomLabel</span>
+                    <span class="chip">@(sim.Kind == SimCardKind.Permanent ? "دائمی" : "اعتباری")</span>
+                    <span class="chip">@(sim.Usage == UsageState.Fresh ? "صفر" : "کارکرده")</span>
+                </div>
+            </div>
+
+            @if (!string.IsNullOrWhiteSpace(sim.Description))
+            {
+                <div class="panel p-6 mb-6">
+                    <h2 class="font-bold text-ink mb-3 flex items-center gap-2">
+                        <svg data-lucide="file-text" class="w-4 h-4 text-primary"></svg>
+                        ویژگی‌های شماره
+                    </h2>
+                    <p class="text-secondary leading-8 text-sm">@sim.Description</p>
+                </div>
+            }
+
+            @if (Model.OrderSubmitted)
+            {
+                <div class="panel p-6 mb-6 border-success/30 bg-success/5 flex items-start gap-3">
+                    <svg data-lucide="circle-check" class="w-5 h-5 text-success shrink-0 mt-0.5"></svg>
+                    <p class="text-sm text-ink">
+                        سفارش شما با کد پیگیری <span class="font-bold">@Model.OrderCode</span> ثبت شد. کارشناسان دفتر به‌زودی با شما تماس می‌گیرند.
+                    </p>
+                </div>
+            }
+            else if (!sim.IsPurchasable)
+            {
+                <div class="panel p-6 mb-6 flex items-center gap-3 text-secondary">
+                    <svg data-lucide="ban" class="w-5 h-5 shrink-0"></svg>
+                    <p class="text-sm">این شماره در حال حاضر فروخته شده یا در دسترس نیست.</p>
+                </div>
+            }
+
+            @if (sim.IsPurchasable && !Model.OrderSubmitted)
+            {
+                <div id="buy-form" class="panel p-6 md:p-8 mb-6 scroll-mt-24">
+                    <h2 class="font-bold text-lg text-ink mb-5 flex items-center gap-2">
+                        <svg data-lucide="shopping-cart" class="w-4 h-4 text-primary"></svg>
+                        فرم خرید شماره <span class="number-plate text-base">@sim.DisplayNumber</span>
+                    </h2>
+
+                    <form method="post" asp-page-handler="Buy" asp-route-number="@sim.Number">
+                        <div class="mb-4">
+                            <label asp-for="Buy.FullName" class="field-label"></label>
+                            <input asp-for="Buy.FullName" class="field-input" autocomplete="name" />
+                            <span asp-validation-for="Buy.FullName" class="field-error"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Buy.Mobile" class="field-label"></label>
+                            <input asp-for="Buy.Mobile" type="tel" dir="ltr" class="field-input" autocomplete="tel" placeholder="09123456789" />
+                            <span asp-validation-for="Buy.Mobile" class="field-error"></span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Buy.Notes" class="field-label"></label>
+                            <textarea asp-for="Buy.Notes" rows="3" class="field-textarea"></textarea>
+                            <span asp-validation-for="Buy.Notes" class="field-error"></span>
+                        </div>
+
+                        <div asp-validation-summary="All" class="field-error mb-4"></div>
+
+                        <button type="submit" class="btn-accent w-full cursor-pointer">
+                            ثبت سفارش و ادامه پرداخت
+                        </button>
+                    </form>
+                </div>
+            
+            
+            
+
+                <div id="call-form" class="panel p-6 md:p-8 mb-6 scroll-mt-24">
+                    @if (Model.CallbackSubmitted)
+                    {
+                        <div class="flex items-center gap-2 text-success text-sm font-medium">
+                            <svg data-lucide="circle-check" class="w-5 h-5"></svg>
+                            درخواست شما ثبت شد. به‌زودی با شما تماس گرفته می‌شود.
+                        </div>
+                    }
+                    else
+                    {
+                        <h2 class="font-bold text-lg text-ink mb-4 flex items-center gap-2">
+                            <svg data-lucide="phone-call" class="w-4 h-4 text-primary"></svg>
+                            درخواست تماس درباره این شماره
+                        </h2>
+                        <form method="post" asp-page-handler="RequestCall" class="flex flex-col md:flex-row gap-3">
+                            <input asp-for="Callback.Mobile" dir="ltr" placeholder="09123456789"
+                                   class="field-input flex-1 text-right" />
+                            <button type="submit" class="btn-primary shrink-0">
+                                <svg data-lucide="phone" class="w-4 h-4"></svg>
+                                درخواست تماس
+                            </button>
+                        </form>
+                        <span asp-validation-for="Callback.Mobile" class="field-error"></span>
+                    }
+                </div>
+            }
+        </div>
+
+        <!-- ============ Summary Card ============ -->
+        <aside class="lg:sticky lg:top-24 space-y-4">
+            <div class="panel p-6">
+                <h2 class="font-bold text-ink mb-4 text-sm">خلاصه شماره</h2>
+                <dl class="space-y-3 text-sm">
+                    <div class="flex items-center justify-between">
+                        <dt class="text-secondary flex items-center gap-1.5"><svg data-lucide="signal" class="w-4 h-4"></svg>اپراتور</dt>
+                        <dd class="font-semibold text-ink">@operatorLabel</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-secondary flex items-center gap-1.5"><svg data-lucide="hash" class="w-4 h-4"></svg>پیش‌شماره</dt>
+                        <dd class="font-semibold text-ink" dir="ltr">@prefix</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-secondary flex items-center gap-1.5"><svg data-lucide="gem" class="w-4 h-4"></svg>نوع شماره</dt>
+                        <dd class="font-semibold text-ink">@randomLabel</dd>
+                    </div>
+                    <div class="flex items-center justify-between">
+                        <dt class="text-secondary flex items-center gap-1.5"><svg data-lucide="circle-dot" class="w-4 h-4"></svg>وضعیت</dt>
+                        <dd><span class="@statusBadgeClass">@statusLabel</span></dd>
+                    </div>
+                </dl>
+
+                <div class="border-t border-line mt-5 pt-5">
+                    @if (sim.DiscountPercent > 0)
+                    {
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="text-sm text-subtle line-through">@sim.Price.ToString("N0") تومان</span>
+                            <span class="badge-danger">@sim.DiscountPercent% تخفیف</span>
+                        </div>
+                    }
+                    <div class="text-2xl font-extrabold text-ink mb-5">@sim.FinalPrice.ToString("N0") <span class="text-sm font-medium text-secondary">تومان</span></div>
+
+                    @if (sim.IsPurchasable && !Model.OrderSubmitted)
+                    {
+                        <div class="grid grid-cols-2 gap-2.5 mb-2.5">
+                            <a href="#buy-form" class="btn-accent col-span-2">
+                                <svg data-lucide="shopping-cart" class="w-4 h-4"></svg>
+                                خرید این شماره
+                            </a>
+                            <a href="#call-form" class="btn-outline text-sm !px-3">درخواست تماس</a>
+                            <a href="tel:@(Model.OfficePhone ?? "02112345678")" data-track="call" data-number="@sim.Number" class="btn-outline text-sm !px-3">تماس با دفتر</a>
+                            @if (!string.IsNullOrEmpty(Model.OfficeWhatsAppLink))
+                            {
+                                <a href="@Model.OfficeWhatsAppLink" target="_blank" rel="noopener" data-track="whatsapp" data-number="@sim.Number" class="btn-outline text-sm !px-3">واتس‌اپ</a>
+                            }
+                            <button type="button" data-share-number="@sim.DisplayNumber" class="btn-outline text-sm !px-3">اشتراک‌گذاری</button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="panel p-5 flex items-start gap-3 text-xs text-secondary leading-6">
+                <svg data-lucide="shield-check" class="w-5 h-5 text-success shrink-0"></svg>
+                خرید این شماره از طریق دفتر خدمات پیشخوان و با ضمانت اصالت انجام می‌شود.
+            </div>
+        </aside>
+    </div>
+
+    @if (Model.SimilarSimCards.Any())
+    {
+        <div class="mt-12">
+            <h2 class="h2-section mb-5">شماره‌های مشابه</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                @foreach (var similar in Model.SimilarSimCards)
+                {
+                    <partial name="_SimCardCard" model="similar" />
+                }
+            </div>
+        </div>
+    }
+</section>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('[data-track]').forEach(function (el) {
+            el.addEventListener('click', function () {
+                var body = new URLSearchParams();
+                body.set('number', el.getAttribute('data-number'));
+                body.set('type', el.getAttribute('data-track'));
+                fetch('/api/simcards/track', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: body.toString()
+                }).catch(function () {});
+                // ناوبری به لینک اصلی (tel: یا واتس‌اپ) بدون وقفه ادامه می‌یابد
+            });
+        });
+
+        document.querySelectorAll('[data-share-number]').forEach(function (btn) {
+            btn.addEventListener('click', async function () {
+                var url = window.location.href;
+                var text = 'شماره ' + btn.getAttribute('data-share-number');
+                if (navigator.share) {
+                    try { await navigator.share({ title: text, url: url }); } catch (e) {}
+                } else {
+                    await navigator.clipboard.writeText(url);
+                    btn.textContent = 'لینک کپی شد';
+                    setTimeout(function () { btn.textContent = 'اشتراک‌گذاری'; }, 2000);
+                }
+            });
+        });
+    </script>
+}

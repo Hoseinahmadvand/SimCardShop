@@ -1,0 +1,36 @@
+@page "/about"
+@{
+    ViewData["Title"] = "درباره ما";
+}
+
+<section class="section py-12 md:py-16 max-w-3xl">
+    <div class="text-center mb-10">
+        <span class="eyebrow mb-4"><svg data-lucide="info" class="w-3.5 h-3.5"></svg>درباره ما</span>
+        <h1 class="h2-section !text-2xl md:!text-3xl">با ما بیشتر آشنا شوید</h1>
+    </div>
+
+    <div class="panel p-6 md:p-10 leading-8 text-secondary mb-6">
+        <p>
+            ما یک دفتر خدمات پیشخوان با سابقه فعالیت در حوزه فروش سیم‌کارت و شماره‌های رند هستیم.
+            هدف ما ارائه شماره‌های معتبر با قیمت شفاف و فرآیند خرید ساده و سریع است.
+        </p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="card-base p-6 text-center">
+            <span class="w-11 h-11 mx-auto rounded-xl bg-primary-50 text-primary flex items-center justify-center mb-3"><svg data-lucide="badge-check" class="w-5 h-5"></svg></span>
+            <div class="font-bold text-ink mb-1">اصالت شماره‌ها</div>
+            <p class="text-xs text-secondary leading-6">تمامی شماره‌ها استعلام و تایید می‌شوند.</p>
+        </div>
+        <div class="card-base p-6 text-center">
+            <span class="w-11 h-11 mx-auto rounded-xl bg-cyan-50 text-cyan flex items-center justify-center mb-3"><svg data-lucide="tag" class="w-5 h-5"></svg></span>
+            <div class="font-bold text-ink mb-1">قیمت شفاف</div>
+            <p class="text-xs text-secondary leading-6">بدون هزینه پنهان، همان قیمت که می‌بینید پرداخت می‌کنید.</p>
+        </div>
+        <div class="card-base p-6 text-center">
+            <span class="w-11 h-11 mx-auto rounded-xl bg-purple-50 text-purple flex items-center justify-center mb-3"><svg data-lucide="headset" class="w-5 h-5"></svg></span>
+            <div class="font-bold text-ink mb-1">پشتیبانی مستمر</div>
+            <p class="text-xs text-secondary leading-6">همراهی کارشناسان دفتر تا دریافت شماره.</p>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,47 @@
+@page "/Admin/Users/Create"
+@model SimCardShop.Pages.Admin.Users.CreateModel
+@{
+    ViewData["Title"] = "افزودن کاربر";
+}
+
+<div class="flex items-center gap-3 mb-6">
+    <a href="/Admin/Users" class="text-muted text-sm">کاربران و فروش</a>
+    <span class="text-muted">/</span>
+    <h1 class="text-xl font-extrabold text-ink">افزودن کاربر جدید</h1>
+</div>
+
+<form method="post" class="card-base p-6 md:p-8 max-w-lg">
+    <div asp-validation-summary="ModelOnly" class="field-error mb-4"></div>
+
+    <div class="mb-5">
+        <label asp-for="Input.DisplayName" class="field-label"></label>
+        <input asp-for="Input.DisplayName" class="field-input" />
+        <span asp-validation-for="Input.DisplayName" class="field-error"></span>
+    </div>
+
+    <div class="mb-5">
+        <label asp-for="Input.Email" class="field-label"></label>
+        <input asp-for="Input.Email" dir="ltr" class="field-input text-right" />
+        <span asp-validation-for="Input.Email" class="field-error"></span>
+    </div>
+
+    <div class="mb-5">
+        <label asp-for="Input.Password" class="field-label"></label>
+        <input asp-for="Input.Password" class="field-input" />
+        <span asp-validation-for="Input.Password" class="field-error"></span>
+        <p class="text-xs text-muted mt-1">پیشنهاد می‌شود کاربر پس از اولین ورود، رمز عبور خود را تغییر دهد.</p>
+    </div>
+
+    <div class="mb-6">
+        <label class="field-label">نقش</label>
+        <select asp-for="Input.Role" class="field-input">
+            <option value="Staff">کارشناس فروش (بدون دسترسی به مدیریت کاربران و تنظیمات)</option>
+            <option value="Admin">مدیر (دسترسی کامل)</option>
+        </select>
+    </div>
+
+    <div class="flex gap-3">
+        <button type="submit" class="btn-accent">ثبت کاربر</button>
+        <a href="/Admin/Users" class="btn-outline">انصراف</a>
+    </div>
+</form>

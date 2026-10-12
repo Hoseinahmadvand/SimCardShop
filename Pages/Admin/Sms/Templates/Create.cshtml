@@ -1,0 +1,33 @@
+@page "/Admin/Sms/Templates/Create"
+@model SimCardShop.Pages.Admin.Sms.Templates.CreateModel
+@{
+    ViewData["Title"] = "افزودن قالب پیامک";
+}
+
+<div class="flex items-center gap-3 mb-6">
+    <a href="/Admin/Sms/Templates" class="text-muted text-sm">قالب‌های پیامک</a>
+    <span class="text-muted">/</span>
+    <h1 class="text-xl font-extrabold text-ink">افزودن قالب جدید</h1>
+</div>
+
+<form method="post" class="card-base p-6 md:p-8 max-w-xl">
+    <div asp-validation-summary="ModelOnly" class="field-error mb-4"></div>
+
+    <div class="mb-5">
+        <label asp-for="Input.Name" class="field-label"></label>
+        <input asp-for="Input.Name" class="field-input" />
+        <span asp-validation-for="Input.Name" class="field-error"></span>
+    </div>
+
+    <div class="mb-5">
+        <label asp-for="Input.Text" class="field-label"></label>
+        <textarea asp-for="Input.Text" rows="6" class="field-input"></textarea>
+        <span asp-validation-for="Input.Text" class="field-error"></span>
+        <p class="text-xs text-muted mt-1">می‌توانید از {Number}، {Price} و {Link} استفاده کنید.</p>
+    </div>
+
+    <div class="flex gap-3">
+        <button type="submit" class="btn-accent">ثبت قالب</button>
+        <a href="/Admin/Sms/Templates" class="btn-outline">انصراف</a>
+    </div>
+</form>

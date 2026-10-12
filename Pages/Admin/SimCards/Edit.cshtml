@@ -1,0 +1,81 @@
+@page "/Admin/SimCards/Edit/{id:int}"
+@model SimCardShop.Pages.Admin.SimCards.EditModel
+@{
+    ViewData["Title"] = "ویرایش شماره";
+}
+
+<div class="flex items-center gap-3 mb-6">
+    <a href="/Admin/SimCards" class="text-muted text-sm">مدیریت شماره‌ها</a>
+    <span class="text-muted">/</span>
+    <h1 class="text-xl font-extrabold text-ink">ویرایش شماره @Model.DisplayNumber</h1>
+</div>
+
+<form method="post" class="card-base p-6 md:p-8 max-w-2xl">
+    <input type="hidden" asp-for="Input.Id" />
+    <div asp-validation-summary="ModelOnly" class="field-error mb-4"></div>
+
+    <div class="grid md:grid-cols-2 gap-5 mb-5">
+        <div class="md:col-span-2">
+            <label asp-for="Input.Number" class="field-label"></label>
+            <input asp-for="Input.Number" dir="ltr" class="field-input text-right" />
+            <span asp-validation-for="Input.Number" class="field-error"></span>
+        </div>
+
+        <div>
+            <label asp-for="Input.Operator" class="field-label"></label>
+            <select asp-for="Input.Operator" asp-items="Html.GetEnumSelectList<OperatorType>()"
+                    class="field-input"></select>
+        </div>
+
+        <div>
+            <label asp-for="Input.Kind" class="field-label"></label>
+            <select asp-for="Input.Kind" asp-items="Html.GetEnumSelectList<SimCardKind>()"
+                    class="field-input"></select>
+        </div>
+
+        <div>
+            <label asp-for="Input.Usage" class="field-label"></label>
+            <select asp-for="Input.Usage" asp-items="Html.GetEnumSelectList<UsageState>()"
+                    class="field-input"></select>
+        </div>
+
+        <div>
+            <label asp-for="Input.RandomnessType" class="field-label"></label>
+            <select asp-for="Input.RandomnessType" asp-items="Html.GetEnumSelectList<RandomnessType>()"
+                    class="field-input"></select>
+        </div>
+
+        <div>
+            <label asp-for="Input.Price" class="field-label"></label>
+            <input asp-for="Input.Price" type="number" class="field-input" />
+            <span asp-validation-for="Input.Price" class="field-error"></span>
+        </div>
+
+        <div>
+            <label asp-for="Input.DiscountPercent" class="field-label"></label>
+            <input asp-for="Input.DiscountPercent" type="number" class="field-input" />
+            <span asp-validation-for="Input.DiscountPercent" class="field-error"></span>
+        </div>
+
+        <div>
+            <label asp-for="Input.Status" class="field-label"></label>
+            <select asp-for="Input.Status" asp-items="Html.GetEnumSelectList<SimCardStatus>()"
+                    class="field-input"></select>
+        </div>
+
+        <div class="flex items-center gap-2 mt-6">
+            <input asp-for="Input.IsFeatured" class="rounded" />
+            <label asp-for="Input.IsFeatured" class="text-sm text-muted"></label>
+        </div>
+
+        <div class="md:col-span-2">
+            <label asp-for="Input.Description" class="field-label"></label>
+            <textarea asp-for="Input.Description" rows="3" class="field-input"></textarea>
+        </div>
+    </div>
+
+    <div class="flex gap-3">
+        <button type="submit" class="btn-accent">ذخیره تغییرات</button>
+        <a href="/Admin/SimCards" class="btn-outline">انصراف</a>
+    </div>
+</form>

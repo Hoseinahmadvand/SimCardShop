@@ -1,0 +1,39 @@
+@page "/Admin/Sms/Templates"
+@model SimCardShop.Pages.Admin.Sms.Templates.IndexModel
+@{
+    ViewData["Title"] = "قالب‌های پیامک";
+}
+
+<div class="flex items-center justify-between mb-6">
+    <h1 class="text-xl font-extrabold text-ink">قالب‌های پیامک</h1>
+    <a href="/Admin/Sms/Templates/Create" class="btn-accent !py-2 !px-5 text-sm">افزودن قالب جدید</a>
+</div>
+
+@if (!string.IsNullOrEmpty(Model.StatusMessage))
+{
+    <div class="rounded-xl bg-emerald-50 text-emerald-800 text-sm p-3 mb-5">@Model.StatusMessage</div>
+}
+
+<div class="grid gap-4">
+    @foreach (var t in Model.Items)
+    {
+        <div class="card-base p-5">
+            <div class="flex items-start justify-between mb-3">
+                <h2 class="font-bold text-ink">@t.Name</h2>
+                <div class="flex items-center gap-3 text-sm">
+                    <a href="/Admin/Sms/Templates/Edit/@t.Id" class="text-primary font-semibold">ویرایش</a>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@t.Id"
+                          onsubmit="return confirm('آیا از حذف این قالب مطمئن هستید؟');" class="inline">
+                        <button type="submit" class="text-danger">حذف</button>
+                    </form>
+                </div>
+            </div>
+            <pre class="text-sm text-muted whitespace-pre-wrap font-sans">@t.Text</pre>
+        </div>
+    }
+
+    @if (!Model.Items.Any())
+    {
+        <div class="card-base p-10 text-center text-muted">هنوز قالبی ثبت نشده است.</div>
+    }
+</div>
